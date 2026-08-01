@@ -1321,7 +1321,7 @@
                 listenToVictims();
             } else {
                 // Redirect to login
-                window.location.href = 'login.html'; // or wherever your login page is
+                window.location.href = 'humbledzlogin.html'; // or wherever your login page is
             }
         });
 
@@ -1334,7 +1334,7 @@
                 showToast('Signed out successfully.', 'success', 'Goodbye');
                 if (unsubscribe) { unsubscribe();
                     unsubscribe = null; }
-                window.location.href = 'login.html';
+                window.location.href = 'humbledzlogin.html';
             } catch (err) {
                 showToast('Error signing out.', 'error');
             }
