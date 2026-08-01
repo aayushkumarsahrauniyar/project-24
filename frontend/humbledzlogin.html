@@ -812,14 +812,14 @@
         //  — Replace with your own Firebase project config.
         // ================================================================
         const firebaseConfig = {
-    apiKey: "AIzaSyB3GIu78tATEum3SUUwShhuYGr-IcJF3Eo",
-    authDomain: "firstproject-44.firebaseapp.com",
-    projectId: "firstproject-44",
-    storageBucket: "firstproject-44.firebasestorage.app",
-    messagingSenderId: "324220801352",
-    appId: "1:324220801352:web:8d9ffb5dcbf119cccf637d",
-    measurementId: "G-9Q8G67HLNW"
-  };
+            apiKey: "AIzaSyB3GIu78tATEum3SUUwShhuYGr-IcJF3Eo",
+            authDomain: "firstproject-44.firebaseapp.com",
+            projectId: "firstproject-44",
+            storageBucket: "firstproject-44.firebasestorage.app",
+            messagingSenderId: "324220801352",
+            appId: "1:324220801352:web:8d9ffb5dcbf119cccf637d",
+            measurementId: "G-9Q8G67HLNW"
+        };
 
         // Initialize Firebase
         firebase.initializeApp(firebaseConfig);
@@ -946,16 +946,23 @@
             try {
                 await auth.signInWithEmailAndPassword(email, password);
                 showToast(`Welcome back, ${email.split('@')[0]}!`, 'success', 'Signed In');
-                loginForm.reset();
+                // Redirect to index.html after a short delay (toast visible)
+                setTimeout(() => {
+                    window.location.href = 'index.html';
+                }, 1000);
             } catch (err) {
                 const msg = getAuthErrorMessage(err.code);
                 showToast(msg, 'error', 'Login Failed');
-            } finally {
                 setLoading(loginBtn, false);
+            } finally {
+                // In case of error, re-enable button; on success we redirect so it's fine
+                if (loginBtn.classList.contains('loading')) {
+                    setLoading(loginBtn, false);
+                }
             }
         }
 
-        // ---- Register with confirm password validation ----
+        // ---- Register ----
         async function handleRegister(e) {
             e.preventDefault();
             const name = regName.value.trim();
@@ -973,7 +980,6 @@
             }
             if (password !== confirm) {
                 showToast('Passwords do not match. Please re-enter.', 'error');
-                // Clear the confirm field for better UX
                 regConfirmPassword.value = '';
                 regConfirmPassword.focus();
                 return;
@@ -997,17 +1003,11 @@
         }
 
         // ---- Auth state listener ----
+        // If user is already logged in, redirect to index.html immediately.
         auth.onAuthStateChanged((user) => {
             if (user) {
-                const name = user.displayName || user.email?.split('@')[0] || 'User';
-                setTimeout(() => {
-                    showToast(`You are signed in as ${name}.`, 'success', 'Authenticated');
-                }, 600);
-                loginForm.querySelectorAll('input, button').forEach(el => el.disabled = true);
-                registerForm.querySelectorAll('input, button').forEach(el => el.disabled = true);
-            } else {
-                loginForm.querySelectorAll('input, button').forEach(el => el.disabled = false);
-                registerForm.querySelectorAll('input, button').forEach(el => el.disabled = false);
+                // Redirect to dashboard
+                window.location.href = 'index.html';
             }
         });
 
@@ -1016,8 +1016,6 @@
             try {
                 await auth.signOut();
                 showToast('You have been signed out.', 'info', 'Signed Out');
-                loginForm.querySelectorAll('input, button').forEach(el => el.disabled = false);
-                registerForm.querySelectorAll('input, button').forEach(el => el.disabled = false);
             } catch (err) {
                 showToast('Error signing out.', 'error');
             }
