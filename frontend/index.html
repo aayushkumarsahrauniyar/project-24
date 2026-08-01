@@ -1,1 +1,1778 @@
-chopha
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Humble DZ • Dashboard</title>
+
+    <!-- Google Font: Poppins -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet" />
+
+    <!-- Font Awesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
+
+    <style>
+        /* ============================================================
+           CSS VARIABLES (consistent with login theme)
+           ============================================================ */
+        :root {
+            --color-emerald: #00E676;
+            --color-cyan: #00D9FF;
+            --color-emerald-glow: rgba(0, 230, 118, 0.25);
+            --color-cyan-glow: rgba(0, 217, 255, 0.20);
+            --glass-bg: rgba(255, 255, 255, 0.04);
+            --glass-border: rgba(255, 255, 255, 0.08);
+            --glass-shadow: 0 25px 60px rgba(0, 0, 0, 0.7);
+            --text-primary: #ffffff;
+            --text-secondary: rgba(255, 255, 255, 0.70);
+            --text-muted: rgba(255, 255, 255, 0.40);
+            --radius-card: 20px;
+            --radius-sm: 12px;
+            --transition-smooth: 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            --font-family: 'Poppins', sans-serif;
+            --sidebar-width: 250px;
+            --sidebar-collapsed: 72px;
+            --header-height: 70px;
+        }
+
+        /* ---------- Reset & Base ---------- */
+        *,
+        *::before,
+        *::after {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        html {
+            font-size: 16px;
+            scroll-behavior: smooth;
+        }
+
+        body {
+            font-family: var(--font-family);
+            background: #0a0a0a;
+            color: var(--text-primary);
+            min-height: 100vh;
+            overflow-x: hidden;
+            display: flex;
+        }
+
+        /* ---------- Animated Background (behind everything) ---------- */
+        .bg-canvas {
+            position: fixed;
+            inset: 0;
+            z-index: 0;
+            background: #0a0a0a;
+            overflow: hidden;
+            pointer-events: none;
+        }
+        .blob {
+            position: absolute;
+            border-radius: 50%;
+            filter: blur(100px);
+            opacity: 0.30;
+            will-change: transform, opacity;
+            animation: blobFloat 22s ease-in-out infinite alternate;
+        }
+        .blob--1 {
+            width: 600px;
+            height: 600px;
+            top: -15%;
+            left: -10%;
+            background: radial-gradient(circle, rgba(0, 230, 118, 0.30), transparent 70%);
+            animation-duration: 25s;
+        }
+        .blob--2 {
+            width: 500px;
+            height: 500px;
+            bottom: -10%;
+            right: -5%;
+            background: radial-gradient(circle, rgba(0, 217, 255, 0.25), transparent 70%);
+            animation-duration: 28s;
+            animation-delay: -6s;
+        }
+        .blob--3 {
+            width: 350px;
+            height: 350px;
+            top: 50%;
+            left: 40%;
+            background: radial-gradient(circle, rgba(0, 230, 118, 0.12), transparent 70%);
+            animation-duration: 20s;
+            animation-delay: -12s;
+            opacity: 0.20;
+        }
+        @keyframes blobFloat {
+            0% {
+                transform: translate(0, 0) scale(1);
+            }
+            33% {
+                transform: translate(50px, -60px) scale(1.06);
+            }
+            66% {
+                transform: translate(-40px, 50px) scale(0.94);
+            }
+            100% {
+                transform: translate(30px, -30px) scale(1.02);
+            }
+        }
+
+        /* ---------- Particle Canvas ---------- */
+        #particleCanvas {
+            position: fixed;
+            inset: 0;
+            z-index: 1;
+            pointer-events: none;
+        }
+
+        /* ============================================================
+           SIDEBAR
+           ============================================================ */
+        .sidebar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            bottom: 0;
+            z-index: 100;
+            width: var(--sidebar-width);
+            background: rgba(10, 10, 10, 0.75);
+            backdrop-filter: blur(24px) saturate(1.4);
+            -webkit-backdrop-filter: blur(24px) saturate(1.4);
+            border-right: 1px solid var(--glass-border);
+            box-shadow: 4px 0 40px rgba(0, 0, 0, 0.5);
+            display: flex;
+            flex-direction: column;
+            transition: width var(--transition-smooth), transform var(--transition-smooth);
+            overflow: hidden;
+        }
+
+        .sidebar-brand {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 20px 20px 16px 20px;
+            border-bottom: 1px solid var(--glass-border);
+            min-height: var(--header-height);
+            flex-shrink: 0;
+        }
+        .sidebar-brand .brand-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, rgba(0, 230, 118, 0.15), rgba(0, 217, 255, 0.10));
+            border: 1px solid rgba(0, 230, 118, 0.20);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 18px;
+            color: var(--color-emerald);
+            flex-shrink: 0;
+        }
+        .sidebar-brand .brand-text {
+            font-size: 1.2rem;
+            font-weight: 700;
+            background: linear-gradient(135deg, var(--color-emerald), var(--color-cyan));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            white-space: nowrap;
+            opacity: 1;
+            transition: opacity var(--transition-smooth);
+        }
+
+        /* Sidebar navigation */
+        .sidebar-nav {
+            flex: 1;
+            overflow-y: auto;
+            padding: 16px 12px 20px 12px;
+            scrollbar-width: thin;
+            scrollbar-color: rgba(255, 255, 255, 0.06) transparent;
+        }
+        .sidebar-nav::-webkit-scrollbar {
+            width: 4px;
+        }
+        .sidebar-nav::-webkit-scrollbar-track {
+            background: transparent;
+        }
+        .sidebar-nav::-webkit-scrollbar-thumb {
+            background: rgba(255, 255, 255, 0.08);
+            border-radius: 10px;
+        }
+
+        .nav-section-title {
+            font-size: 0.6rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 1.2px;
+            color: var(--text-muted);
+            padding: 12px 12px 6px 12px;
+            white-space: nowrap;
+            opacity: 1;
+            transition: opacity var(--transition-smooth);
+        }
+
+        .nav-item {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            padding: 10px 14px;
+            border-radius: var(--radius-sm);
+            color: var(--text-secondary);
+            text-decoration: none;
+            font-size: 0.85rem;
+            font-weight: 500;
+            transition: all var(--transition-smooth);
+            cursor: pointer;
+            border: none;
+            background: transparent;
+            width: 100%;
+            font-family: var(--font-family);
+            position: relative;
+            white-space: nowrap;
+        }
+        .nav-item:hover {
+            background: rgba(255, 255, 255, 0.05);
+            color: #fff;
+        }
+        .nav-item.active {
+            background: rgba(0, 230, 118, 0.08);
+            color: var(--color-emerald);
+            box-shadow: inset 3px 0 0 var(--color-emerald);
+        }
+        .nav-item.active::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            border-radius: var(--radius-sm);
+            padding: 1px;
+            background: linear-gradient(135deg, rgba(0, 230, 118, 0.10), transparent 60%);
+            -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+            -webkit-mask-composite: xor;
+            mask-composite: exclude;
+            pointer-events: none;
+        }
+        .nav-item i {
+            width: 22px;
+            text-align: center;
+            font-size: 0.95rem;
+            flex-shrink: 0;
+        }
+        .nav-item .nav-label {
+            opacity: 1;
+            transition: opacity var(--transition-smooth);
+        }
+        .nav-item .nav-badge {
+            margin-left: auto;
+            font-size: 0.6rem;
+            background: rgba(0, 230, 118, 0.12);
+            color: var(--color-emerald);
+            padding: 2px 10px;
+            border-radius: 20px;
+            font-weight: 600;
+        }
+
+        /* Sidebar footer (sign out) */
+        .sidebar-footer {
+            padding: 16px 20px;
+            border-top: 1px solid var(--glass-border);
+            flex-shrink: 0;
+        }
+        .sidebar-footer .nav-item {
+            padding: 10px 14px;
+        }
+
+        /* ---------- Sidebar collapsed state (mobile toggle) ---------- */
+        .sidebar.collapsed {
+            width: var(--sidebar-collapsed);
+        }
+        .sidebar.collapsed .brand-text,
+        .sidebar.collapsed .nav-label,
+        .sidebar.collapsed .nav-section-title,
+        .sidebar.collapsed .nav-badge {
+            opacity: 0;
+            width: 0;
+            overflow: hidden;
+            display: none;
+        }
+        .sidebar.collapsed .nav-item {
+            justify-content: center;
+            padding: 10px 0;
+        }
+        .sidebar.collapsed .nav-item i {
+            margin: 0;
+        }
+
+        /* ---------- Mobile overlay ---------- */
+        .sidebar-overlay {
+            display: none;
+            position: fixed;
+            inset: 0;
+            z-index: 90;
+            background: rgba(0, 0, 0, 0.60);
+            backdrop-filter: blur(4px);
+            -webkit-backdrop-filter: blur(4px);
+        }
+        .sidebar-overlay.active {
+            display: block;
+        }
+
+        /* ============================================================
+           MAIN CONTENT
+           ============================================================ */
+        .main-content {
+            flex: 1;
+            margin-left: var(--sidebar-width);
+            padding: 24px 32px 40px 32px;
+            position: relative;
+            z-index: 10;
+            min-height: 100vh;
+            transition: margin-left var(--transition-smooth);
+        }
+
+        /* ---------- Top bar ---------- */
+        .topbar {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 8px 0 20px 0;
+            border-bottom: 1px solid var(--glass-border);
+            margin-bottom: 28px;
+            flex-wrap: wrap;
+            gap: 12px;
+        }
+        .topbar-left {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+        .topbar-left .menu-toggle {
+            display: none;
+            background: none;
+            border: none;
+            color: var(--text-secondary);
+            font-size: 1.3rem;
+            cursor: pointer;
+            padding: 6px 8px;
+            border-radius: 8px;
+            transition: background var(--transition-smooth);
+        }
+        .topbar-left .menu-toggle:hover {
+            background: rgba(255, 255, 255, 0.06);
+        }
+        .topbar-left .page-title {
+            font-size: 1.4rem;
+            font-weight: 700;
+            letter-spacing: -0.3px;
+            background: linear-gradient(135deg, var(--color-emerald), var(--color-cyan));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        .topbar-right {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+        .topbar-right .user-info {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+        }
+        .topbar-right .user-info .avatar {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, rgba(0, 230, 118, 0.15), rgba(0, 217, 255, 0.10));
+            border: 1px solid rgba(0, 230, 118, 0.15);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.9rem;
+            color: var(--color-emerald);
+        }
+        .topbar-right .user-info .user-name {
+            font-weight: 500;
+        }
+
+        /* ---------- Stats cards ---------- */
+        .stats-row {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+            gap: 16px;
+            margin-bottom: 28px;
+        }
+        .stat-card {
+            background: var(--glass-bg);
+            backdrop-filter: blur(12px) saturate(1.2);
+            -webkit-backdrop-filter: blur(12px) saturate(1.2);
+            border: 1px solid var(--glass-border);
+            border-radius: var(--radius-sm);
+            padding: 18px 20px;
+            transition: all var(--transition-smooth);
+        }
+        .stat-card:hover {
+            border-color: rgba(0, 230, 118, 0.15);
+            box-shadow: 0 0 30px rgba(0, 230, 118, 0.03);
+        }
+        .stat-card .stat-label {
+            font-size: 0.7rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            color: var(--text-muted);
+            font-weight: 500;
+        }
+        .stat-card .stat-value {
+            font-size: 1.6rem;
+            font-weight: 700;
+            margin-top: 4px;
+            background: linear-gradient(135deg, var(--color-emerald), var(--color-cyan));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        .stat-card .stat-icon {
+            float: right;
+            font-size: 1.4rem;
+            color: var(--text-muted);
+            opacity: 0.4;
+        }
+
+        /* ---------- Table Card ---------- */
+        .table-card {
+            background: var(--glass-bg);
+            backdrop-filter: blur(16px) saturate(1.3);
+            -webkit-backdrop-filter: blur(16px) saturate(1.3);
+            border: 1px solid var(--glass-border);
+            border-radius: var(--radius-card);
+            padding: 24px 24px 20px 24px;
+            box-shadow: var(--glass-shadow);
+            transition: border-color var(--transition-smooth), box-shadow var(--transition-smooth);
+            position: relative;
+            overflow: hidden;
+        }
+        .table-card::before {
+            content: '';
+            position: absolute;
+            inset: -1px;
+            border-radius: var(--radius-card);
+            padding: 1px;
+            background: conic-gradient(from 0deg at 50% 50%, transparent, var(--color-emerald-glow), transparent 40%, var(--color-cyan-glow), transparent 80%, transparent);
+            -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+            -webkit-mask-composite: xor;
+            mask-composite: exclude;
+            opacity: 0;
+            transition: opacity var(--transition-smooth);
+            pointer-events: none;
+        }
+        .table-card:hover::before {
+            opacity: 0.4;
+        }
+
+        /* Table controls */
+        .table-controls {
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            justify-content: space-between;
+            gap: 16px;
+            margin-bottom: 20px;
+        }
+        .table-controls .left {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            flex-wrap: wrap;
+        }
+        .table-controls .right {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            flex-wrap: wrap;
+        }
+
+        .control-group {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 0.8rem;
+            color: var(--text-secondary);
+        }
+        .control-group label {
+            font-weight: 500;
+        }
+
+        .control-select {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid var(--glass-border);
+            border-radius: 8px;
+            padding: 6px 12px;
+            color: #fff;
+            font-family: var(--font-family);
+            font-size: 0.8rem;
+            outline: none;
+            cursor: pointer;
+            transition: border-color var(--transition-smooth);
+        }
+        .control-select:focus {
+            border-color: var(--color-emerald);
+        }
+        .control-select option {
+            background: #1a1a1a;
+            color: #fff;
+        }
+
+        .search-wrap {
+            position: relative;
+            display: flex;
+            align-items: center;
+        }
+        .search-wrap i {
+            position: absolute;
+            left: 12px;
+            color: var(--text-muted);
+            font-size: 0.8rem;
+        }
+        .search-wrap input {
+            background: rgba(255, 255, 255, 0.04);
+            border: 1px solid var(--glass-border);
+            border-radius: 8px;
+            padding: 8px 14px 8px 36px;
+            color: #fff;
+            font-family: var(--font-family);
+            font-size: 0.8rem;
+            outline: none;
+            width: 220px;
+            transition: border-color var(--transition-smooth), box-shadow var(--transition-smooth);
+        }
+        .search-wrap input::placeholder {
+            color: var(--text-muted);
+        }
+        .search-wrap input:focus {
+            border-color: var(--color-emerald);
+            box-shadow: 0 0 0 3px rgba(0, 230, 118, 0.06);
+        }
+
+        .btn-action {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 8px 18px;
+            border: none;
+            border-radius: 8px;
+            font-family: var(--font-family);
+            font-size: 0.78rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all var(--transition-smooth);
+            background: rgba(255, 255, 255, 0.04);
+            color: var(--text-secondary);
+            border: 1px solid var(--glass-border);
+        }
+        .btn-action:hover {
+            background: rgba(255, 255, 255, 0.08);
+            color: #fff;
+        }
+        .btn-action.danger:hover {
+            background: rgba(255, 82, 82, 0.12);
+            border-color: rgba(255, 82, 82, 0.20);
+            color: #ff5252;
+        }
+        .btn-action.primary {
+            background: rgba(0, 230, 118, 0.08);
+            color: var(--color-emerald);
+            border-color: rgba(0, 230, 118, 0.15);
+        }
+        .btn-action.primary:hover {
+            background: rgba(0, 230, 118, 0.15);
+            box-shadow: 0 0 20px rgba(0, 230, 118, 0.05);
+        }
+        .btn-action:disabled {
+            opacity: 0.4;
+            cursor: not-allowed;
+            transform: none !important;
+        }
+
+        /* ---------- Table ---------- */
+        .table-responsive {
+            overflow-x: auto;
+            margin: 0 -4px;
+            border-radius: var(--radius-sm);
+        }
+        .table-responsive table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.82rem;
+            min-width: 720px;
+        }
+        .table-responsive table thead {
+            background: rgba(255, 255, 255, 0.02);
+            border-bottom: 1px solid var(--glass-border);
+        }
+        .table-responsive table thead th {
+            padding: 12px 14px;
+            text-align: left;
+            font-weight: 600;
+            font-size: 0.7rem;
+            text-transform: uppercase;
+            letter-spacing: 0.4px;
+            color: var(--text-muted);
+            white-space: nowrap;
+            position: sticky;
+            top: 0;
+            background: rgba(10, 10, 10, 0.80);
+            backdrop-filter: blur(8px);
+            -webkit-backdrop-filter: blur(8px);
+        }
+        .table-responsive table tbody tr {
+            border-bottom: 1px solid rgba(255, 255, 255, 0.03);
+            transition: background var(--transition-smooth);
+        }
+        .table-responsive table tbody tr:hover {
+            background: rgba(255, 255, 255, 0.02);
+        }
+        .table-responsive table tbody td {
+            padding: 12px 14px;
+            color: var(--text-secondary);
+            vertical-align: middle;
+        }
+        .table-responsive table tbody td .badge-country {
+            display: inline-block;
+            padding: 2px 12px;
+            border-radius: 20px;
+            background: rgba(0, 217, 255, 0.06);
+            color: var(--color-cyan);
+            font-size: 0.7rem;
+            font-weight: 500;
+            border: 1px solid rgba(0, 217, 255, 0.06);
+        }
+        .table-responsive table tbody td .badge-id {
+            font-family: monospace;
+            font-size: 0.75rem;
+            color: var(--text-muted);
+        }
+        .table-responsive table tbody .row-delete {
+            cursor: pointer;
+            color: var(--text-muted);
+            transition: color var(--transition-smooth);
+            background: none;
+            border: none;
+            font-size: 0.9rem;
+            padding: 4px 8px;
+            border-radius: 6px;
+        }
+        .table-responsive table tbody .row-delete:hover {
+            color: #ff5252;
+            background: rgba(255, 82, 82, 0.08);
+        }
+
+        /* Skeleton rows */
+        .skeleton-row td {
+            height: 48px;
+        }
+        .skeleton-row td .skeleton {
+            height: 14px;
+            background: rgba(255, 255, 255, 0.04);
+            border-radius: 4px;
+            width: 80%;
+            animation: pulse 1.5s ease-in-out infinite;
+        }
+        .skeleton-row td .skeleton.short {
+            width: 50%;
+        }
+        .skeleton-row td .skeleton.long {
+            width: 90%;
+        }
+        @keyframes pulse {
+            0%,
+            100% {
+                opacity: 0.3;
+            }
+            50% {
+                opacity: 0.6;
+            }
+        }
+
+        /* ---------- Table footer (pagination) ---------- */
+        .table-footer {
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            justify-content: space-between;
+            gap: 12px;
+            padding-top: 18px;
+            border-top: 1px solid var(--glass-border);
+            margin-top: 18px;
+        }
+        .table-footer .info {
+            font-size: 0.78rem;
+            color: var(--text-muted);
+        }
+        .table-footer .info strong {
+            color: var(--text-secondary);
+        }
+
+        .pagination {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+        .pagination button {
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid var(--glass-border);
+            border-radius: 6px;
+            padding: 6px 14px;
+            color: var(--text-secondary);
+            font-family: var(--font-family);
+            font-size: 0.78rem;
+            cursor: pointer;
+            transition: all var(--transition-smooth);
+            min-width: 36px;
+            text-align: center;
+        }
+        .pagination button:hover:not(:disabled) {
+            background: rgba(255, 255, 255, 0.06);
+            color: #fff;
+        }
+        .pagination button.active {
+            background: rgba(0, 230, 118, 0.10);
+            border-color: rgba(0, 230, 118, 0.20);
+            color: var(--color-emerald);
+        }
+        .pagination button:disabled {
+            opacity: 0.3;
+            cursor: not-allowed;
+        }
+        .pagination button:focus-visible {
+            outline: 2px solid var(--color-cyan);
+            outline-offset: 2px;
+        }
+
+        /* ---------- Empty state ---------- */
+        .empty-state {
+            text-align: center;
+            padding: 48px 20px;
+            color: var(--text-muted);
+        }
+        .empty-state i {
+            font-size: 3rem;
+            margin-bottom: 16px;
+            opacity: 0.3;
+        }
+        .empty-state h3 {
+            font-weight: 500;
+            color: var(--text-secondary);
+        }
+        .empty-state p {
+            font-size: 0.85rem;
+        }
+
+        /* ============================================================
+           TOAST NOTIFICATIONS
+           ============================================================ */
+        .toast-container {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            z-index: 9999;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            max-width: 380px;
+            width: 100%;
+            pointer-events: none;
+        }
+        .toast {
+            pointer-events: auto;
+            background: rgba(20, 20, 20, 0.88);
+            backdrop-filter: blur(16px) saturate(1.3);
+            -webkit-backdrop-filter: blur(16px) saturate(1.3);
+            border: 1px solid rgba(255, 255, 255, 0.06);
+            border-radius: 16px;
+            padding: 16px 20px;
+            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.5);
+            display: flex;
+            align-items: flex-start;
+            gap: 14px;
+            transform: translateX(120%);
+            opacity: 0;
+            transition: all 0.4s cubic-bezier(0.22, 1, 0.36, 1);
+            color: #fff;
+        }
+        .toast.show {
+            transform: translateX(0);
+            opacity: 1;
+        }
+        .toast-icon {
+            flex-shrink: 0;
+            width: 28px;
+            height: 28px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.9rem;
+            margin-top: 1px;
+        }
+        .toast--success .toast-icon {
+            background: rgba(0, 230, 118, 0.15);
+            color: var(--color-emerald);
+        }
+        .toast--error .toast-icon {
+            background: rgba(255, 82, 82, 0.15);
+            color: #ff5252;
+        }
+        .toast--info .toast-icon {
+            background: rgba(0, 217, 255, 0.15);
+            color: var(--color-cyan);
+        }
+        .toast-body {
+            flex: 1;
+        }
+        .toast-title {
+            font-size: 0.85rem;
+            font-weight: 600;
+            margin-bottom: 2px;
+        }
+        .toast-message {
+            font-size: 0.8rem;
+            color: var(--text-secondary);
+            font-weight: 300;
+        }
+        .toast-close {
+            flex-shrink: 0;
+            background: none;
+            border: none;
+            color: var(--text-muted);
+            cursor: pointer;
+            font-size: 0.9rem;
+            padding: 4px;
+            transition: color var(--transition-smooth);
+            border-radius: 6px;
+            margin-top: -2px;
+        }
+        .toast-close:hover {
+            color: #fff;
+        }
+        .toast-close:focus-visible {
+            outline: 2px solid var(--color-cyan);
+            outline-offset: 2px;
+        }
+
+        /* ============================================================
+           RESPONSIVE
+           ============================================================ */
+        @media (max-width: 1024px) {
+            .main-content {
+                padding: 20px 20px 32px 20px;
+            }
+            .stats-row {
+                grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            }
+        }
+
+        @media (max-width: 768px) {
+            .sidebar {
+                transform: translateX(-100%);
+                width: var(--sidebar-width);
+            }
+            .sidebar.open {
+                transform: translateX(0);
+            }
+            .sidebar.collapsed {
+                width: var(--sidebar-width);
+                transform: translateX(-100%);
+            }
+            .sidebar.collapsed.open {
+                transform: translateX(0);
+            }
+            .sidebar.collapsed .brand-text,
+            .sidebar.collapsed .nav-label,
+            .sidebar.collapsed .nav-section-title,
+            .sidebar.collapsed .nav-badge {
+                opacity: 1;
+                width: auto;
+                display: flex;
+            }
+            .sidebar.collapsed .nav-item {
+                justify-content: flex-start;
+                padding: 10px 14px;
+            }
+            .sidebar.collapsed .nav-item i {
+                margin: 0 14px 0 0;
+            }
+
+            .main-content {
+                margin-left: 0 !important;
+                padding: 16px 16px 28px 16px;
+            }
+
+            .topbar-left .menu-toggle {
+                display: block;
+            }
+            .topbar-left .page-title {
+                font-size: 1.1rem;
+            }
+            .topbar-right .user-info .user-name {
+                display: none;
+            }
+
+            .table-controls {
+                flex-direction: column;
+                align-items: stretch;
+            }
+            .table-controls .left,
+            .table-controls .right {
+                flex-wrap: wrap;
+                justify-content: flex-start;
+            }
+            .search-wrap input {
+                width: 100%;
+                min-width: 160px;
+            }
+
+            .table-footer {
+                flex-direction: column;
+                align-items: stretch;
+                text-align: center;
+            }
+            .pagination {
+                justify-content: center;
+                flex-wrap: wrap;
+            }
+
+            .stats-row {
+                grid-template-columns: repeat(2, 1fr);
+                gap: 12px;
+            }
+            .stat-card .stat-value {
+                font-size: 1.2rem;
+            }
+
+            .table-card {
+                padding: 16px 14px 16px 14px;
+            }
+            .table-responsive table {
+                font-size: 0.75rem;
+                min-width: 600px;
+            }
+            .table-responsive table thead th,
+            .table-responsive table tbody td {
+                padding: 8px 10px;
+            }
+
+            .toast-container {
+                bottom: 16px;
+                right: 16px;
+                left: 16px;
+                max-width: none;
+            }
+            .toast {
+                padding: 14px 16px;
+                font-size: 0.85rem;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .stats-row {
+                grid-template-columns: 1fr 1fr;
+                gap: 8px;
+            }
+            .stat-card {
+                padding: 14px 16px;
+            }
+            .stat-card .stat-value {
+                font-size: 1rem;
+            }
+            .stat-card .stat-label {
+                font-size: 0.6rem;
+            }
+            .table-card {
+                padding: 12px 10px 14px 10px;
+            }
+            .table-responsive table {
+                font-size: 0.7rem;
+                min-width: 520px;
+            }
+            .table-responsive table thead th,
+            .table-responsive table tbody td {
+                padding: 6px 8px;
+            }
+            .btn-action {
+                padding: 6px 12px;
+                font-size: 0.7rem;
+            }
+            .control-select {
+                font-size: 0.7rem;
+                padding: 4px 8px;
+            }
+        }
+
+        /* ---------- Reduced motion ---------- */
+        @media (prefers-reduced-motion: reduce) {
+            *,
+            *::before,
+            *::after {
+                animation-duration: 0.01ms !important;
+                animation-iteration-count: 1 !important;
+                transition-duration: 0.01ms !important;
+            }
+            .blob {
+                animation: none !important;
+            }
+        }
+
+        /* ---------- Scrollbar global ---------- */
+        ::-webkit-scrollbar {
+            width: 6px;
+            height: 6px;
+        }
+        ::-webkit-scrollbar-track {
+            background: transparent;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: rgba(255, 255, 255, 0.08);
+            border-radius: 10px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: rgba(255, 255, 255, 0.14);
+        }
+    </style>
+</head>
+
+<body>
+
+    <!-- ============================================================
+    BACKGROUND
+    ============================================================ -->
+    <div class="bg-canvas" aria-hidden="true">
+        <div class="blob blob--1"></div>
+        <div class="blob blob--2"></div>
+        <div class="blob blob--3"></div>
+    </div>
+    <canvas id="particleCanvas" aria-hidden="true"></canvas>
+
+    <!-- ============================================================
+    SIDEBAR OVERLAY (mobile)
+    ============================================================ -->
+    <div class="sidebar-overlay" id="sidebarOverlay"></div>
+
+    <!-- ============================================================
+    SIDEBAR
+    ============================================================ -->
+    <aside class="sidebar" id="sidebar" role="navigation" aria-label="Main navigation">
+        <!-- Brand -->
+        <div class="sidebar-brand">
+            <div class="brand-icon" aria-hidden="true"><i class="fas fa-cube"></i></div>
+            <span class="brand-text">Humble DZ</span>
+        </div>
+
+        <!-- Navigation -->
+        <nav class="sidebar-nav">
+            <div class="nav-section-title">Dashboards</div>
+            <button class="nav-item" data-page="home"><i class="fas fa-home"></i><span class="nav-label">Home</span></button>
+            <button class="nav-item active" data-page="victims"><i class="fas fa-users"></i><span class="nav-label">Victims</span><span class="nav-badge" id="victimCount">0</span></button>
+            <button class="nav-item" data-page="scams"><i class="fas fa-shield-alt"></i><span class="nav-label">Scams</span></button>
+            <button class="nav-item" data-page="temp"><i class="fas fa-file-alt"></i><span class="nav-label">Temp Page</span></button>
+            <button class="nav-item" data-page="change-password"><i class="fas fa-key"></i><span class="nav-label">Change Password</span></button>
+
+            <div class="nav-section-title" style="margin-top:16px;">Sniper Tools</div>
+            <button class="nav-item" data-page="encrypter"><i class="fas fa-lock"></i><span class="nav-label">Scam Encrypter</span></button>
+            <button class="nav-item" data-page="converter"><i class="fas fa-blog"></i><span class="nav-label">Convert To Blogger</span></button>
+
+            <div class="nav-section-title" style="margin-top:16px;">Social Media</div>
+            <button class="nav-item" data-page="tutorials"><i class="fas fa-graduation-cap"></i><span class="nav-label">Tutorials</span></button>
+            <button class="nav-item" data-page="telegram"><i class="fab fa-telegram"></i><span class="nav-label">Telegram</span></button>
+        </nav>
+
+        <!-- Footer -->
+        <div class="sidebar-footer">
+            <button class="nav-item" id="signOutBtn" style="color:var(--text-muted);">
+                <i class="fas fa-sign-out-alt"></i><span class="nav-label">Sign Out</span>
+            </button>
+        </div>
+    </aside>
+
+    <!-- ============================================================
+    MAIN CONTENT
+    ============================================================ -->
+    <main class="main-content" id="mainContent">
+
+        <!-- Top Bar -->
+        <header class="topbar">
+            <div class="topbar-left">
+                <button class="menu-toggle" id="menuToggle" aria-label="Toggle sidebar" aria-expanded="false">
+                    <i class="fas fa-bars"></i>
+                </button>
+                <h1 class="page-title" id="pageTitle">Victims</h1>
+            </div>
+            <div class="topbar-right">
+                <div class="user-info">
+                    <div class="avatar" aria-hidden="true"><i class="fas fa-user"></i></div>
+                    <span class="user-name" id="userNameDisplay">Admin</span>
+                </div>
+            </div>
+        </header>
+
+        <!-- Stats -->
+        <section class="stats-row" id="statsRow">
+            <div class="stat-card">
+                <span class="stat-icon"><i class="fas fa-users"></i></span>
+                <div class="stat-label">Total Victims</div>
+                <div class="stat-value" id="totalVictims">0</div>
+            </div>
+            <div class="stat-card">
+                <span class="stat-icon"><i class="fas fa-globe"></i></span>
+                <div class="stat-label">Countries</div>
+                <div class="stat-value" id="totalCountries">0</div>
+            </div>
+            <div class="stat-card">
+                <span class="stat-icon"><i class="fas fa-clock"></i></span>
+                <div class="stat-label">Today</div>
+                <div class="stat-value" id="todayVictims">0</div>
+            </div>
+            <div class="stat-card">
+                <span class="stat-icon"><i class="fas fa-database"></i></span>
+                <div class="stat-label">Records</div>
+                <div class="stat-value" id="totalRecords">0</div>
+            </div>
+        </section>
+
+        <!-- Table Card -->
+        <section class="table-card" aria-label="Victims data table">
+
+            <!-- Controls -->
+            <div class="table-controls">
+                <div class="left">
+                    <div class="control-group">
+                        <label for="entriesSelect">Show</label>
+                        <select class="control-select" id="entriesSelect">
+                            <option value="5">5</option>
+                            <option value="10" selected>10</option>
+                            <option value="25">25</option>
+                            <option value="50">50</option>
+                        </select>
+                        <span>entries</span>
+                    </div>
+                </div>
+                <div class="right">
+                    <div class="search-wrap">
+                        <i class="fas fa-search" aria-hidden="true"></i>
+                        <input type="text" id="searchInput" placeholder="Search for keywords..." aria-label="Search victims" />
+                    </div>
+                    <button class="btn-action danger" id="removeAllBtn" title="Remove all victims">
+                        <i class="fas fa-trash-alt"></i> Remove all
+                    </button>
+                    <button class="btn-action primary" id="downloadAllBtn" title="Download all as JSON">
+                        <i class="fas fa-download"></i> Download all
+                    </button>
+                </div>
+            </div>
+
+            <!-- Table -->
+            <div class="table-responsive">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Scama</th>
+                            <th>User name</th>
+                            <th>User Pass</th>
+                            <th>Victime date</th>
+                            <th>Victime Ip</th>
+                            <th>Country</th>
+                            <th style="width:44px;text-align:center;">✕</th>
+                        </tr>
+                    </thead>
+                    <tbody id="tableBody">
+                        <!-- Rows rendered by JavaScript -->
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- Footer -->
+            <div class="table-footer">
+                <div class="info" id="tableInfo">Showing <strong>0</strong> to <strong>0</strong> of <strong>0</strong> entries</div>
+                <div class="pagination" id="paginationControls">
+                    <button id="prevPage" disabled><i class="fas fa-chevron-left"></i> Previous</button>
+                    <span id="pageNumbers"></span>
+                    <button id="nextPage" disabled>Next <i class="fas fa-chevron-right"></i></button>
+                </div>
+            </div>
+
+        </section>
+    </main>
+
+    <!-- ============================================================
+    TOAST CONTAINER
+    ============================================================ -->
+    <div class="toast-container" id="toastContainer" role="status" aria-live="polite"></div>
+
+    <!-- ============================================================
+    FIREBASE SDK
+    ============================================================ -->
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js">
+    </script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js">
+    </script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js">
+    </script>
+
+    <script>
+        // ================================================================
+        //  1.  FIREBASE CONFIG (replace with your own)
+        // ================================================================
+        const firebaseConfig = {
+            apiKey: "AIzaSyDummyKeyReplaceWithYourOwn",
+            authDomain: "your-project.firebaseapp.com",
+            projectId: "your-project-id",
+            storageBucket: "your-project.appspot.com",
+            messagingSenderId: "123456789",
+            appId: "1:123456789:web:abcdef123456"
+        };
+
+        firebase.initializeApp(firebaseConfig);
+        const auth = firebase.auth();
+        const db = firebase.firestore();
+
+        // Enable offline persistence (optional)
+        db.enablePersistence({ synchronizeTabs: true }).catch(() => {});
+
+        // ================================================================
+        //  2.  DOM REFS
+        // ================================================================
+        const sidebar = document.getElementById('sidebar');
+        const overlay = document.getElementById('sidebarOverlay');
+        const menuToggle = document.getElementById('menuToggle');
+        const tableBody = document.getElementById('tableBody');
+        const entriesSelect = document.getElementById('entriesSelect');
+        const searchInput = document.getElementById('searchInput');
+        const prevPageBtn = document.getElementById('prevPage');
+        const nextPageBtn = document.getElementById('nextPage');
+        const pageNumbers = document.getElementById('pageNumbers');
+        const tableInfo = document.getElementById('tableInfo');
+        const totalVictims = document.getElementById('totalVictims');
+        const totalCountries = document.getElementById('totalCountries');
+        const todayVictims = document.getElementById('todayVictims');
+        const totalRecords = document.getElementById('totalRecords');
+        const victimCountBadge = document.getElementById('victimCount');
+        const removeAllBtn = document.getElementById('removeAllBtn');
+        const downloadAllBtn = document.getElementById('downloadAllBtn');
+        const signOutBtn = document.getElementById('signOutBtn');
+        const userNameDisplay = document.getElementById('userNameDisplay');
+        const toastContainer = document.getElementById('toastContainer');
+
+        // ================================================================
+        //  3.  STATE
+        // ================================================================
+        let allVictims = [];
+        let filteredVictims = [];
+        let currentPage = 1;
+        let pageSize = 10;
+        let isLoading = false;
+        let unsubscribe = null;
+
+        // ================================================================
+        //  4.  TOAST SYSTEM
+        // ================================================================
+        function showToast(message, type = 'info', title = '') {
+            const iconMap = { success: 'fa-check-circle', error: 'fa-exclamation-circle', info: 'fa-info-circle' };
+            const titleMap = { success: 'Success', error: 'Error', info: 'Notice' };
+            const toast = document.createElement('div');
+            toast.className = `toast toast--${type}`;
+            toast.setAttribute('role', 'alert');
+            toast.innerHTML = `
+                <div class="toast-icon" aria-hidden="true"><i class="fas ${iconMap[type] || iconMap.info}"></i></div>
+                <div class="toast-body">
+                    <div class="toast-title">${title || titleMap[type] || 'Info'}</div>
+                    <div class="toast-message">${message}</div>
+                </div>
+                <button class="toast-close" aria-label="Dismiss"><i class="fas fa-times"></i></button>
+            `;
+            toastContainer.appendChild(toast);
+            requestAnimationFrame(() => toast.classList.add('show'));
+            let timeout = setTimeout(() => dismissToast(toast), 4500);
+            toast.querySelector('.toast-close').addEventListener('click', () => { clearTimeout(timeout);
+                dismissToast(toast); });
+            toast.addEventListener('keydown', (e) => { if (e.key === 'Escape') { clearTimeout(timeout);
+                    dismissToast(toast); } });
+            toast.addEventListener('mouseenter', () => clearTimeout(timeout));
+            toast.addEventListener('mouseleave', () => { timeout = setTimeout(() => dismissToast(toast), 3500); });
+            return toast;
+        }
+
+        function dismissToast(toast) {
+            toast.classList.remove('show');
+            toast.addEventListener('transitionend', () => { if (toast.parentNode) toast.remove(); }, { once: true });
+            setTimeout(() => { if (toast.parentNode) toast.remove(); }, 500);
+        }
+
+        // ================================================================
+        //  5.  AUTH STATE
+        // ================================================================
+        auth.onAuthStateChanged((user) => {
+            if (user) {
+                const name = user.displayName || user.email?.split('@')[0] || 'Admin';
+                userNameDisplay.textContent = name;
+                // Start listening to victims
+                listenToVictims();
+            } else {
+                // Redirect to login
+                window.location.href = 'login.html'; // or wherever your login page is
+            }
+        });
+
+        // ================================================================
+        //  6.  SIGN OUT
+        // ================================================================
+        signOutBtn.addEventListener('click', async () => {
+            try {
+                await auth.signOut();
+                showToast('Signed out successfully.', 'success', 'Goodbye');
+                if (unsubscribe) { unsubscribe();
+                    unsubscribe = null; }
+                window.location.href = 'login.html';
+            } catch (err) {
+                showToast('Error signing out.', 'error');
+            }
+        });
+
+        // ================================================================
+        //  7.  FIRESTORE: LISTEN TO VICTIMS COLLECTION
+        // ================================================================
+        function listenToVictims() {
+            if (unsubscribe) {
+                unsubscribe();
+                unsubscribe = null;
+            }
+
+            // Show skeletons while loading
+            renderSkeletons();
+
+            unsubscribe = db.collection('victims')
+                .orderBy('createdAt', 'desc')
+                .onSnapshot((snapshot) => {
+                    const docs = [];
+                    snapshot.forEach((doc) => {
+                        const data = doc.data();
+                        docs.push({
+                            id: doc.id,
+                            scama: data.scama || '—',
+                            userName: data.userName || '—',
+                            userPass: data.userPass || '—',
+                            victimeDate: data.victimeDate || '—',
+                            victimeIp: data.victimeIp || '—',
+                            country: data.country || '—',
+                            createdAt: data.createdAt || null,
+                        });
+                    });
+                    allVictims = docs;
+                    applyFiltersAndRender();
+                    updateStats();
+                }, (error) => {
+                    console.error('Firestore error:', error);
+                    showToast('Error loading data: ' + error.message, 'error');
+                    // Retry after 5s
+                    setTimeout(listenToVictims, 5000);
+                });
+        }
+
+        // ================================================================
+        //  8.  RENDER FUNCTIONS
+        // ================================================================
+        function renderSkeletons() {
+            const rows = Array.from({ length: pageSize }, (_, i) => `
+                <tr class="skeleton-row" key="skeleton-${i}">
+                    <td><div class="skeleton short"></div></td>
+                    <td><div class="skeleton"></div></td>
+                    <td><div class="skeleton"></div></td>
+                    <td><div class="skeleton short"></div></td>
+                    <td><div class="skeleton"></div></td>
+                    <td><div class="skeleton short"></div></td>
+                    <td><div class="skeleton short"></div></td>
+                    <td></td>
+                </tr>
+            `).join('');
+            tableBody.innerHTML = rows;
+            // Update info with loading state
+            tableInfo.innerHTML = 'Loading <i class="fas fa-spinner fa-spin" style="margin-left:8px;"></i>';
+            pageNumbers.innerHTML = '';
+            prevPageBtn.disabled = true;
+            nextPageBtn.disabled = true;
+        }
+
+        function applyFiltersAndRender() {
+            const query = searchInput.value.trim().toLowerCase();
+            if (query) {
+                filteredVictims = allVictims.filter(v =>
+                    v.scama.toLowerCase().includes(query) ||
+                    v.userName.toLowerCase().includes(query) ||
+                    v.userPass.toLowerCase().includes(query) ||
+                    v.victimeIp.toLowerCase().includes(query) ||
+                    v.country.toLowerCase().includes(query) ||
+                    v.id.toLowerCase().includes(query)
+                );
+            } else {
+                filteredVictims = [...allVictims];
+            }
+            currentPage = 1;
+            renderTable();
+        }
+
+        function renderTable() {
+            const start = (currentPage - 1) * pageSize;
+            const end = Math.min(start + pageSize, filteredVictims.length);
+            const pageData = filteredVictims.slice(start, end);
+
+            if (filteredVictims.length === 0) {
+                tableBody.innerHTML = `
+                    <tr><td colspan="8">
+                        <div class="empty-state">
+                            <i class="fas fa-inbox"></i>
+                            <h3>No victims found</h3>
+                            <p>${allVictims.length === 0 ? 'Add your first victim record.' : 'Try adjusting your search.'}</p>
+                        </div>
+                    </td></tr>
+                `;
+            } else {
+                tableBody.innerHTML = pageData.map(v => `
+                    <tr>
+                        <td><span class="badge-id">#${v.id.slice(0, 8)}</span></td>
+                        <td><strong>${escHtml(v.scama)}</strong></td>
+                        <td>${escHtml(v.userName)}</td>
+                        <td><code style="background:rgba(255,255,255,0.04);padding:2px 8px;border-radius:4px;font-size:0.75rem;">${escHtml(v.userPass)}</code></td>
+                        <td>${escHtml(v.victimeDate)}</td>
+                        <td><code style="font-size:0.75rem;color:var(--text-muted);">${escHtml(v.victimeIp)}</code></td>
+                        <td><span class="badge-country">${escHtml(v.country)}</span></td>
+                        <td style="text-align:center;">
+                            <button class="row-delete" data-id="${v.id}" aria-label="Delete victim" title="Delete">
+                                <i class="fas fa-times"></i>
+                            </button>
+                        </td>
+                    </tr>
+                `).join('');
+            }
+
+            // Attach delete events
+            document.querySelectorAll('.row-delete').forEach(btn => {
+                btn.addEventListener('click', () => {
+                    const id = btn.dataset.id;
+                    deleteVictim(id);
+                });
+            });
+
+            // Update pagination
+            updatePagination(start, end);
+            updateTableInfo(start, end);
+
+            // Update badge
+            victimCountBadge.textContent = allVictims.length;
+        }
+
+        function updatePagination(start, end) {
+            const total = filteredVictims.length;
+            const totalPages = Math.ceil(total / pageSize) || 1;
+
+            prevPageBtn.disabled = currentPage <= 1;
+            nextPageBtn.disabled = currentPage >= totalPages;
+
+            // Page numbers
+            let html = '';
+            const maxVisible = 5;
+            let startPage = Math.max(1, currentPage - Math.floor(maxVisible / 2));
+            let endPage = Math.min(totalPages, startPage + maxVisible - 1);
+            if (endPage - startPage < maxVisible - 1) {
+                startPage = Math.max(1, endPage - maxVisible + 1);
+            }
+
+            for (let i = startPage; i <= endPage; i++) {
+                html += `<button class="${i === currentPage ? 'active' : ''}" data-page="${i}">${i}</button>`;
+            }
+            pageNumbers.innerHTML = html;
+
+            // Page click handlers
+            pageNumbers.querySelectorAll('button').forEach(btn => {
+                btn.addEventListener('click', () => {
+                    const page = parseInt(btn.dataset.page);
+                    if (page !== currentPage) {
+                        currentPage = page;
+                        renderTable();
+                    }
+                });
+            });
+        }
+
+        function updateTableInfo(start, end) {
+            const total = filteredVictims.length;
+            if (total === 0) {
+                tableInfo.innerHTML = 'Showing <strong>0</strong> to <strong>0</strong> of <strong>0</strong> entries';
+            } else {
+                tableInfo.innerHTML =
+                    `Showing <strong>${start + 1}</strong> to <strong>${end}</strong> of <strong>${total}</strong> entries`;
+            }
+        }
+
+        function updateStats() {
+            const total = allVictims.length;
+            totalVictims.textContent = total;
+            totalRecords.textContent = total;
+
+            // Unique countries
+            const countries = new Set(allVictims.map(v => v.country).filter(c => c && c !== '—'));
+            totalCountries.textContent = countries.size;
+
+            // Today's victims (using createdAt)
+            const today = new Date();
+            today.setHours(0, 0, 0, 0);
+            const todayCount = allVictims.filter(v => {
+                if (!v.createdAt) return false;
+                const d = v.createdAt.toDate ? v.createdAt.toDate() : new Date(v.createdAt);
+                d.setHours(0, 0, 0, 0);
+                return d.getTime() === today.getTime();
+            }).length;
+            todayVictims.textContent = todayCount;
+
+            victimCountBadge.textContent = total;
+        }
+
+        // ================================================================
+        //  9.  CRUD OPERATIONS
+        // ================================================================
+
+        // --- Delete single victim ---
+        async function deleteVictim(id) {
+            if (!confirm('Delete this victim record?')) return;
+            try {
+                await db.collection('victims').doc(id).delete();
+                showToast('Victim record deleted.', 'success', 'Deleted');
+            } catch (err) {
+                showToast('Error deleting: ' + err.message, 'error');
+            }
+        }
+
+        // --- Remove all ---
+        removeAllBtn.addEventListener('click', async () => {
+            if (allVictims.length === 0) {
+                showToast('No victims to remove.', 'info');
+                return;
+            }
+            if (!confirm(`Remove all ${allVictims.length} victim records? This cannot be undone.`)) return;
+
+            try {
+                const batch = db.batch();
+                const snap = await db.collection('victims').get();
+                snap.forEach(doc => batch.delete(doc.ref));
+                await batch.commit();
+                showToast(`Removed ${snap.size} records.`, 'success', 'All Removed');
+            } catch (err) {
+                showToast('Error removing all: ' + err.message, 'error');
+            }
+        });
+
+        // --- Download all as JSON ---
+        downloadAllBtn.addEventListener('click', () => {
+            if (allVictims.length === 0) {
+                showToast('No data to download.', 'info');
+                return;
+            }
+            const data = JSON.stringify(allVictims, null, 2);
+            const blob = new Blob([data], { type: 'application/json' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `victims_${new Date().toISOString().slice(0,10)}.json`;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+            showToast(`Downloaded ${allVictims.length} records.`, 'success', 'Downloaded');
+        });
+
+        // ================================================================
+        //  10. SEARCH & PAGINATION CONTROLS
+        // ================================================================
+
+        // Debounced search
+        let searchTimeout = null;
+        searchInput.addEventListener('input', () => {
+            clearTimeout(searchTimeout);
+            searchTimeout = setTimeout(() => {
+                applyFiltersAndRender();
+            }, 300);
+        });
+
+        entriesSelect.addEventListener('change', () => {
+            pageSize = parseInt(entriesSelect.value);
+            currentPage = 1;
+            renderTable();
+        });
+
+        prevPageBtn.addEventListener('click', () => {
+            if (currentPage > 1) { currentPage--;
+                renderTable(); }
+        });
+
+        nextPageBtn.addEventListener('click', () => {
+            const totalPages = Math.ceil(filteredVictims.length / pageSize);
+            if (currentPage < totalPages) { currentPage++;
+                renderTable(); }
+        });
+
+        // ================================================================
+        //  11. SIDEBAR TOGGLE (mobile)
+        // ================================================================
+        function toggleSidebar(open) {
+            const isOpen = open !== undefined ? open : !sidebar.classList.contains('open');
+            sidebar.classList.toggle('open', isOpen);
+            overlay.classList.toggle('active', isOpen);
+            menuToggle.setAttribute('aria-expanded', isOpen);
+            menuToggle.querySelector('i').className = isOpen ? 'fas fa-times' : 'fas fa-bars';
+        }
+
+        menuToggle.addEventListener('click', () => toggleSidebar());
+        overlay.addEventListener('click', () => toggleSidebar(false));
+
+        // Close sidebar on Escape
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape' && sidebar.classList.contains('open')) {
+                toggleSidebar(false);
+            }
+        });
+
+        // Close on window resize to desktop
+        window.addEventListener('resize', () => {
+            if (window.innerWidth > 768 && sidebar.classList.contains('open')) {
+                toggleSidebar(false);
+            }
+        });
+
+        // ================================================================
+        //  12. SIDEBAR NAVIGATION (demo placeholders)
+        // ================================================================
+        document.querySelectorAll('.nav-item[data-page]').forEach(item => {
+            item.addEventListener('click', () => {
+                // Remove active from all
+                document.querySelectorAll('.nav-item[data-page]').forEach(el => el.classList.remove('active'));
+                item.classList.add('active');
+
+                const page = item.dataset.page;
+                const title = item.querySelector('.nav-label')?.textContent || page;
+                document.getElementById('pageTitle').textContent = title;
+
+                // Close sidebar on mobile
+                if (window.innerWidth <= 768) toggleSidebar(false);
+
+                // Show a toast for demo (except for victims which is the current view)
+                if (page !== 'victims') {
+                    showToast(`Navigated to "${title}" — demo placeholder.`, 'info', 'Navigation');
+                }
+            });
+        });
+
+        // ================================================================
+        //  13. PARTICLE SYSTEM (same as login)
+        // ================================================================
+        const canvas = document.getElementById('particleCanvas');
+        const ctx = canvas.getContext('2d');
+        let particles = [];
+        let particleCount = 60;
+        let animFrameId = null;
+
+        function resizeCanvas() {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+        }
+        window.addEventListener('resize', () => { resizeCanvas();
+            initParticles(); });
+
+        class Particle {
+            constructor() {
+                this.x = Math.random() * canvas.width;
+                this.y = Math.random() * canvas.height;
+                this.size = Math.random() * 2 + 0.6;
+                this.speedX = (Math.random() - 0.5) * 0.3;
+                this.speedY = (Math.random() - 0.5) * 0.3;
+                this.opacity = Math.random() * 0.4 + 0.1;
+                const hue = Math.random() > 0.5 ? 145 : 190;
+                this.color = `hsla(${hue}, 80%, 60%, ${this.opacity})`;
+            }
+            update() {
+                this.x += this.speedX;
+                this.y += this.speedY;
+                if (this.x < 0) this.x = canvas.width;
+                if (this.x > canvas.width) this.x = 0;
+                if (this.y < 0) this.y = canvas.height;
+                if (this.y > canvas.height) this.y = 0;
+            }
+            draw() {
+                ctx.beginPath();
+                ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+                ctx.fillStyle = this.color;
+                ctx.fill();
+                if (this.size > 1.2) {
+                    ctx.shadowColor = 'rgba(0,230,118,0.04)';
+                    ctx.shadowBlur = 10;
+                    ctx.fill();
+                    ctx.shadowBlur = 0;
+                }
+            }
+        }
+
+        function initParticles() {
+            particles = [];
+            const area = canvas.width * canvas.height;
+            const target = Math.min(100, Math.max(30, Math.floor(area / 18000)));
+            particleCount = target;
+            for (let i = 0; i < particleCount; i++) particles.push(new Particle());
+        }
+
+        function animateParticles() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            particles.forEach(p => { p.update();
+                p.draw(); });
+            animFrameId = requestAnimationFrame(animateParticles);
+        }
+
+        resizeCanvas();
+        initParticles();
+        animateParticles();
+
+        document.addEventListener('visibilitychange', () => {
+            if (document.hidden) { if (animFrameId) cancelAnimationFrame(animFrameId); } else { animateParticles(); }
+        });
+
+        // ================================================================
+        //  14. ESCAPE TO CLOSE TOASTS (global)
+        // ================================================================
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape') {
+                const openToasts = toastContainer.querySelectorAll('.toast.show');
+                openToasts.forEach(t => dismissToast(t));
+            }
+        });
+
+        // ================================================================
+        //  15. HELPER: escape HTML
+        // ================================================================
+        function escHtml(str) {
+            if (!str) return '—';
+            const div = document.createElement('div');
+            div.textContent = str;
+            return div.innerHTML;
+        }
+
+        // ================================================================
+        //  16. INITIAL LOAD — show skeletons, then data loads via listener
+        // ================================================================
+        renderSkeletons();
+
+        console.log('🚀 Humble DZ · Dashboard ready');
+        console.log('💡 Data is synced with Firebase Firestore "victims" collection.');
+        console.log('📊 Add documents with fields: scama, userName, userPass, victimeDate, victimeIp, country, createdAt');
+    </script>
+
+</body>
+</html>
