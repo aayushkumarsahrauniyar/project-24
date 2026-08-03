@@ -1,0 +1,1177 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Humble DZ · Victims</title>
+
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;14..32,400;14..32,500;14..32,600;14..32,700;14..32,800&family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet" />
+
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
+
+    <style>
+        /* ============================================================
+           CSS VARIABLES — Premium Dark Theme
+           ============================================================ */
+        :root {
+            --color-emerald: #00E676;
+            --color-cyan: #00D9FF;
+            --color-emerald-dim: rgba(0, 230, 118, 0.12);
+            --color-cyan-dim: rgba(0, 217, 255, 0.10);
+            --color-emerald-glow: rgba(0, 230, 118, 0.20);
+            --color-cyan-glow: rgba(0, 217, 255, 0.15);
+            --glass-bg: rgba(255, 255, 255, 0.035);
+            --glass-border: rgba(255, 255, 255, 0.06);
+            --glass-shadow: 0 25px 60px rgba(0, 0, 0, 0.65);
+            --text-primary: #ffffff;
+            --text-secondary: rgba(255, 255, 255, 0.72);
+            --text-muted: rgba(255, 255, 255, 0.38);
+            --radius-card: 20px;
+            --radius-sm: 12px;
+            --radius-xs: 8px;
+            --transition-smooth: 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            --font-family: 'Inter', 'Poppins', sans-serif;
+            --header-height: 68px;
+            --bottom-nav-height: 64px;
+        }
+
+        /* ---------- Reset & Base ---------- */
+        *,
+        *::before,
+        *::after {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        html {
+            font-size: 16px;
+            scroll-behavior: smooth;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        body {
+            font-family: var(--font-family);
+            background: #080808;
+            color: var(--text-primary);
+            min-height: 100vh;
+            overflow-x: hidden;
+            background-image: radial-gradient(ellipse at 20% 50%, rgba(0, 230, 118, 0.03) 0%, transparent 60%),
+                radial-gradient(ellipse at 80% 80%, rgba(0, 217, 255, 0.02) 0%, transparent 50%);
+        }
+
+        /* ---------- Animated Background ---------- */
+        .bg-canvas {
+            position: fixed;
+            inset: 0;
+            z-index: 0;
+            background: #080808;
+            overflow: hidden;
+            pointer-events: none;
+        }
+        .blob {
+            position: absolute;
+            border-radius: 50%;
+            filter: blur(120px);
+            opacity: 0.25;
+            will-change: transform, opacity;
+            animation: blobFloat 24s ease-in-out infinite alternate;
+        }
+        .blob--1 {
+            width: 700px;
+            height: 700px;
+            top: -20%;
+            left: -15%;
+            background: radial-gradient(circle, rgba(0, 230, 118, 0.25), transparent 70%);
+            animation-duration: 28s;
+        }
+        .blob--2 {
+            width: 550px;
+            height: 550px;
+            bottom: -15%;
+            right: -10%;
+            background: radial-gradient(circle, rgba(0, 217, 255, 0.20), transparent 70%);
+            animation-duration: 30s;
+            animation-delay: -8s;
+        }
+        .blob--3 {
+            width: 400px;
+            height: 400px;
+            top: 45%;
+            left: 35%;
+            background: radial-gradient(circle, rgba(0, 230, 118, 0.08), transparent 70%);
+            animation-duration: 22s;
+            animation-delay: -14s;
+            opacity: 0.15;
+        }
+        @keyframes blobFloat {
+            0% {
+                transform: translate(0, 0) scale(1) rotate(0deg);
+            }
+            33% {
+                transform: translate(60px, -70px) scale(1.08) rotate(4deg);
+            }
+            66% {
+                transform: translate(-50px, 60px) scale(0.92) rotate(-3deg);
+            }
+            100% {
+                transform: translate(40px, -40px) scale(1.03) rotate(2deg);
+            }
+        }
+
+        /* ---------- Particle Canvas ---------- */
+        #particleCanvas {
+            position: fixed;
+            inset: 0;
+            z-index: 1;
+            pointer-events: none;
+        }
+
+        /* ============================================================
+           MAIN CONTENT
+           ============================================================ */
+        .main-content {
+            flex: 1;
+            margin: 0 auto;
+            max-width: 1400px;
+            padding: 20px 32px 32px 32px;
+            position: relative;
+            z-index: 10;
+            min-height: 100vh;
+            padding-bottom: calc(32px + var(--bottom-nav-height));
+            width: 100%;
+        }
+
+        /* ---------- Top Bar ---------- */
+        .topbar {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 6px 0 18px 0;
+            border-bottom: 1px solid var(--glass-border);
+            margin-bottom: 28px;
+            flex-wrap: wrap;
+            gap: 12px;
+        }
+        .topbar-left {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+        .topbar-left .back-btn {
+            background: none;
+            border: 1px solid var(--glass-border);
+            color: var(--text-secondary);
+            padding: 8px 14px;
+            border-radius: var(--radius-xs);
+            cursor: pointer;
+            transition: all var(--transition-smooth);
+            font-family: var(--font-family);
+            font-size: 0.85rem;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            text-decoration: none;
+        }
+        .topbar-left .back-btn:hover {
+            background: rgba(255, 255, 255, 0.05);
+            color: #fff;
+        }
+        .topbar-left .page-title {
+            font-size: 1.5rem;
+            font-weight: 800;
+            letter-spacing: -0.5px;
+            background: linear-gradient(135deg, var(--color-emerald), var(--color-cyan));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        .topbar-left .page-subtitle {
+            font-size: 0.75rem;
+            color: var(--text-muted);
+            font-weight: 400;
+            -webkit-text-fill-color: var(--text-muted);
+            margin-left: 4px;
+        }
+        .topbar-right {
+            display: flex;
+            align-items: center;
+            gap: 18px;
+        }
+        .topbar-right .user-info {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+        }
+        .topbar-right .user-info .avatar {
+            width: 38px;
+            height: 38px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--color-emerald-dim), var(--color-cyan-dim));
+            border: 1px solid rgba(0, 230, 118, 0.12);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.9rem;
+            color: var(--color-emerald);
+            transition: all var(--transition-smooth);
+        }
+        .topbar-right .user-info .user-name {
+            font-weight: 600;
+        }
+        .topbar-right .sign-out-btn {
+            background: none;
+            border: 1px solid var(--glass-border);
+            color: var(--text-muted);
+            padding: 6px 14px;
+            border-radius: var(--radius-xs);
+            cursor: pointer;
+            transition: all var(--transition-smooth);
+            font-family: var(--font-family);
+            font-size: 0.8rem;
+        }
+        .topbar-right .sign-out-btn:hover {
+            background: rgba(255, 82, 82, 0.08);
+            color: #ff5252;
+            border-color: rgba(255, 82, 82, 0.15);
+        }
+
+        /* ---------- Stats Row ---------- */
+        .stats-row {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+            gap: 16px;
+            margin-bottom: 28px;
+        }
+        .stat-card {
+            background: var(--glass-bg);
+            backdrop-filter: blur(12px) saturate(1.2);
+            -webkit-backdrop-filter: blur(12px) saturate(1.2);
+            border: 1px solid var(--glass-border);
+            border-radius: var(--radius-sm);
+            padding: 18px 22px;
+            transition: all var(--transition-smooth);
+            position: relative;
+            overflow: hidden;
+        }
+        .stat-card:hover {
+            border-color: rgba(0, 230, 118, 0.12);
+            transform: translateY(-2px);
+            box-shadow: 0 8px 40px rgba(0, 0, 0, 0.2);
+        }
+        .stat-card .stat-icon {
+            float: right;
+            font-size: 1.5rem;
+            color: var(--text-muted);
+            opacity: 0.25;
+        }
+        .stat-card .stat-label {
+            font-size: 0.7rem;
+            text-transform: uppercase;
+            letter-spacing: 0.6px;
+            color: var(--text-muted);
+            font-weight: 600;
+        }
+        .stat-card .stat-value {
+            font-size: 1.7rem;
+            font-weight: 800;
+            margin-top: 4px;
+            background: linear-gradient(135deg, var(--color-emerald), var(--color-cyan));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            letter-spacing: -0.5px;
+        }
+
+        /* ---------- Glass Card ---------- */
+        .glass-card {
+            background: var(--glass-bg);
+            backdrop-filter: blur(16px) saturate(1.3);
+            -webkit-backdrop-filter: blur(16px) saturate(1.3);
+            border: 1px solid var(--glass-border);
+            border-radius: var(--radius-card);
+            padding: 26px 28px;
+            box-shadow: var(--glass-shadow);
+            transition: border-color var(--transition-smooth), box-shadow var(--transition-smooth);
+            position: relative;
+            overflow: hidden;
+        }
+        .glass-card::before {
+            content: '';
+            position: absolute;
+            inset: -1px;
+            border-radius: var(--radius-card);
+            padding: 1px;
+            background: conic-gradient(from 0deg at 50% 50%, transparent, var(--color-emerald-glow), transparent 35%, var(--color-cyan-glow), transparent 70%, transparent);
+            -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+            -webkit-mask-composite: xor;
+            mask-composite: exclude;
+            opacity: 0;
+            transition: opacity var(--transition-smooth);
+            pointer-events: none;
+        }
+        .glass-card:hover::before {
+            opacity: 0.5;
+        }
+        .glass-card .card-title {
+            font-size: 1rem;
+            font-weight: 700;
+            margin-bottom: 16px;
+            color: var(--text-primary);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .glass-card .card-title i {
+            color: var(--color-emerald);
+            opacity: 0.8;
+        }
+
+        /* ============================================================
+           TEMPLATE-WISE VICTIMS DISPLAY
+           ============================================================ */
+        .template-group {
+            margin-bottom: 28px;
+        }
+        .template-group:last-child {
+            margin-bottom: 0;
+        }
+
+        .template-header {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            padding: 14px 20px;
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid var(--glass-border);
+            border-radius: var(--radius-sm);
+            margin-bottom: 12px;
+            cursor: pointer;
+            transition: all var(--transition-smooth);
+        }
+        .template-header:hover {
+            background: rgba(255, 255, 255, 0.05);
+            border-color: rgba(0, 230, 118, 0.12);
+        }
+        .template-header .template-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: var(--color-emerald-dim);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--color-emerald);
+            font-size: 1rem;
+            flex-shrink: 0;
+        }
+        .template-header .template-name {
+            font-weight: 700;
+            font-size: 1.05rem;
+            color: var(--text-primary);
+            flex: 1;
+        }
+        .template-header .template-count {
+            font-size: 0.8rem;
+            color: var(--text-muted);
+            background: rgba(255, 255, 255, 0.04);
+            padding: 4px 14px;
+            border-radius: 20px;
+            font-weight: 500;
+        }
+        .template-header .template-toggle {
+            color: var(--text-muted);
+            transition: transform var(--transition-smooth);
+            font-size: 0.9rem;
+        }
+        .template-header .template-toggle.open {
+            transform: rotate(180deg);
+        }
+
+        .template-body {
+            overflow: hidden;
+            transition: max-height 0.4s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.3s ease;
+            max-height: 0;
+            opacity: 0;
+        }
+        .template-body.open {
+            max-height: 5000px;
+            opacity: 1;
+        }
+
+        .victims-table-wrap {
+            overflow-x: auto;
+            border-radius: var(--radius-sm);
+            border: 1px solid var(--glass-border);
+        }
+        .victims-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.82rem;
+            min-width: 650px;
+        }
+        .victims-table thead {
+            background: rgba(255, 255, 255, 0.02);
+            border-bottom: 1px solid var(--glass-border);
+        }
+        .victims-table th {
+            padding: 12px 16px;
+            text-align: left;
+            font-weight: 700;
+            font-size: 0.65rem;
+            text-transform: uppercase;
+            letter-spacing: 0.6px;
+            color: var(--text-muted);
+        }
+        .victims-table td {
+            padding: 10px 16px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.02);
+            vertical-align: middle;
+        }
+        .victims-table tr:hover td {
+            background: rgba(255, 255, 255, 0.02);
+        }
+        .victims-table .badge-ip {
+            font-family: monospace;
+            font-size: 0.75rem;
+            color: var(--text-muted);
+            background: rgba(255, 255, 255, 0.04);
+            padding: 2px 10px;
+            border-radius: 4px;
+        }
+        .victims-table .badge-country {
+            display: inline-block;
+            padding: 2px 12px;
+            border-radius: 20px;
+            background: var(--color-cyan-dim);
+            color: var(--color-cyan);
+            font-size: 0.7rem;
+            font-weight: 600;
+            border: 1px solid rgba(0, 217, 255, 0.05);
+        }
+        .victims-table .badge-pass {
+            font-family: monospace;
+            font-size: 0.75rem;
+            background: rgba(255, 255, 255, 0.04);
+            padding: 2px 10px;
+            border-radius: 4px;
+            color: var(--text-secondary);
+        }
+
+        /* ---------- Empty State ---------- */
+        .empty-state {
+            text-align: center;
+            padding: 50px 20px;
+            color: var(--text-muted);
+        }
+        .empty-state i {
+            font-size: 3.5rem;
+            margin-bottom: 16px;
+            opacity: 0.2;
+        }
+        .empty-state h3 {
+            font-weight: 600;
+            color: var(--text-secondary);
+        }
+        .empty-state p {
+            font-size: 0.85rem;
+        }
+
+        /* ---------- Skeleton ---------- */
+        .skeleton {
+            background: rgba(255, 255, 255, 0.04);
+            border-radius: 4px;
+            animation: pulse 1.6s ease-in-out infinite;
+        }
+        @keyframes pulse {
+            0%,
+            100% {
+                opacity: 0.4;
+            }
+            50% {
+                opacity: 0.8;
+            }
+        }
+
+        /* ---------- Toast ---------- */
+        .toast-container {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            z-index: 9999;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            max-width: 400px;
+            width: 100%;
+            pointer-events: none;
+        }
+        .toast {
+            pointer-events: auto;
+            background: rgba(16, 16, 16, 0.92);
+            backdrop-filter: blur(18px) saturate(1.4);
+            -webkit-backdrop-filter: blur(18px) saturate(1.4);
+            border: 1px solid rgba(255, 255, 255, 0.06);
+            border-radius: 16px;
+            padding: 16px 20px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.6);
+            display: flex;
+            align-items: flex-start;
+            gap: 14px;
+            transform: translateX(120%);
+            opacity: 0;
+            transition: all 0.45s cubic-bezier(0.22, 1, 0.36, 1);
+            color: #fff;
+        }
+        .toast.show {
+            transform: translateX(0);
+            opacity: 1;
+        }
+        .toast-icon {
+            flex-shrink: 0;
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.9rem;
+            margin-top: 1px;
+        }
+        .toast--success .toast-icon {
+            background: var(--color-emerald-dim);
+            color: var(--color-emerald);
+        }
+        .toast--error .toast-icon {
+            background: rgba(255, 82, 82, 0.15);
+            color: #ff5252;
+        }
+        .toast--info .toast-icon {
+            background: var(--color-cyan-dim);
+            color: var(--color-cyan);
+        }
+        .toast-body {
+            flex: 1;
+        }
+        .toast-title {
+            font-size: 0.85rem;
+            font-weight: 700;
+            margin-bottom: 2px;
+        }
+        .toast-message {
+            font-size: 0.8rem;
+            color: var(--text-secondary);
+            font-weight: 400;
+        }
+        .toast-close {
+            flex-shrink: 0;
+            background: none;
+            border: none;
+            color: var(--text-muted);
+            cursor: pointer;
+            font-size: 0.9rem;
+            padding: 4px;
+            transition: color var(--transition-smooth);
+            border-radius: 6px;
+            margin-top: -2px;
+        }
+        .toast-close:hover {
+            color: #fff;
+        }
+
+        /* ============================================================
+           RESPONSIVE
+           ============================================================ */
+        @media (max-width: 1024px) {
+            .main-content {
+                padding: 16px 20px 28px 20px;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .main-content {
+                padding: 12px 14px 20px 14px;
+                padding-bottom: calc(20px + var(--bottom-nav-height) + 8px);
+            }
+
+            .topbar-left .page-title {
+                font-size: 1.1rem;
+            }
+            .topbar-left .page-subtitle {
+                display: none;
+            }
+            .topbar-right .user-info .user-name {
+                display: none;
+            }
+
+            .stats-row {
+                grid-template-columns: repeat(2, 1fr);
+                gap: 10px;
+            }
+            .stat-card .stat-value {
+                font-size: 1.2rem;
+            }
+
+            .glass-card {
+                padding: 16px 18px;
+            }
+
+            .template-header {
+                padding: 12px 16px;
+                flex-wrap: wrap;
+            }
+            .template-header .template-name {
+                font-size: 0.9rem;
+            }
+            .template-header .template-count {
+                font-size: 0.7rem;
+                padding: 2px 10px;
+            }
+
+            .victims-table {
+                font-size: 0.75rem;
+                min-width: 550px;
+            }
+            .victims-table th,
+            .victims-table td {
+                padding: 8px 12px;
+            }
+
+            .toast-container {
+                bottom: 80px;
+                right: 16px;
+                left: 16px;
+                max-width: none;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .stats-row {
+                grid-template-columns: 1fr 1fr;
+                gap: 8px;
+            }
+            .stat-card {
+                padding: 12px 14px;
+            }
+            .stat-card .stat-value {
+                font-size: 1rem;
+            }
+
+            .glass-card {
+                padding: 12px 14px;
+            }
+
+            .template-header {
+                padding: 10px 12px;
+                gap: 10px;
+            }
+            .template-header .template-icon {
+                width: 32px;
+                height: 32px;
+                font-size: 0.8rem;
+            }
+            .template-header .template-name {
+                font-size: 0.8rem;
+            }
+
+            .victims-table {
+                font-size: 0.7rem;
+                min-width: 420px;
+            }
+            .victims-table th,
+            .victims-table td {
+                padding: 6px 8px;
+            }
+        }
+
+        /* ---------- Reduced Motion ---------- */
+        @media (prefers-reduced-motion: reduce) {
+            *,
+            *::before,
+            *::after {
+                animation-duration: 0.01ms !important;
+                animation-iteration-count: 1 !important;
+                transition-duration: 0.01ms !important;
+            }
+            .blob {
+                animation: none !important;
+            }
+        }
+
+        /* ---------- Scrollbar ---------- */
+        ::-webkit-scrollbar {
+            width: 6px;
+            height: 6px;
+        }
+        ::-webkit-scrollbar-track {
+            background: transparent;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: rgba(255, 255, 255, 0.06);
+            border-radius: 10px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: rgba(255, 255, 255, 0.10);
+        }
+
+        /* ---------- Utilities ---------- */
+        .flex-wrap {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 12px;
+            align-items: center;
+        }
+        .text-muted {
+            color: var(--text-muted);
+        }
+        .mt-16 {
+            margin-top: 16px;
+        }
+    </style>
+</head>
+
+<body>
+
+    <!-- ============================================================
+    BACKGROUND
+    ============================================================ -->
+    <div class="bg-canvas" aria-hidden="true">
+        <div class="blob blob--1"></div>
+        <div class="blob blob--2"></div>
+        <div class="blob blob--3"></div>
+    </div>
+    <canvas id="particleCanvas" aria-hidden="true"></canvas>
+
+    <!-- ============================================================
+    MAIN CONTENT
+    ============================================================ -->
+    <main class="main-content" id="mainContent">
+
+        <!-- Top Bar -->
+        <header class="topbar">
+            <div class="topbar-left">
+                <a href="index.html" class="back-btn"><i class="fas fa-arrow-left"></i> Back</a>
+                <h1 class="page-title" id="pageTitle">Victims <span class="page-subtitle">· Template-wise</span></h1>
+            </div>
+            <div class="topbar-right">
+                <div class="user-info">
+                    <div class="avatar" aria-hidden="true"><i class="fas fa-user"></i></div>
+                    <span class="user-name" id="userNameDisplay">Admin</span>
+                </div>
+                <button class="sign-out-btn" id="signOutBtn"><i class="fas fa-sign-out-alt"></i> Logout</button>
+            </div>
+        </header>
+
+        <!-- Stats Row -->
+        <div class="stats-row" id="statsRow">
+            <div class="stat-card">
+                <span class="stat-icon"><i class="fas fa-users"></i></span>
+                <div class="stat-label">Total Victims</div>
+                <div class="stat-value" id="totalVictims">0</div>
+            </div>
+            <div class="stat-card">
+                <span class="stat-icon"><i class="fas fa-layer-group"></i></span>
+                <div class="stat-label">Templates</div>
+                <div class="stat-value" id="totalTemplates">0</div>
+            </div>
+            <div class="stat-card">
+                <span class="stat-icon"><i class="fas fa-globe"></i></span>
+                <div class="stat-label">Countries</div>
+                <div class="stat-value" id="totalCountries">0</div>
+            </div>
+            <div class="stat-card">
+                <span class="stat-icon"><i class="fas fa-calendar-day"></i></span>
+                <div class="stat-label">Today</div>
+                <div class="stat-value" id="todayVictims">0</div>
+            </div>
+        </div>
+
+        <!-- Victims List - Template Wise -->
+        <div class="glass-card">
+            <div class="card-title"><i class="fas fa-file-code"></i> Victims by Template</div>
+            <div id="victimsContainer">
+                <!-- Rendered by JavaScript -->
+                <div class="empty-state">
+                    <i class="fas fa-spinner fa-spin"></i>
+                    <h3>Loading victims...</h3>
+                    <p>Please wait while we fetch the data.</p>
+                </div>
+            </div>
+        </div>
+
+    </main>
+
+    <!-- ============================================================
+    TOAST CONTAINER
+    ============================================================ -->
+    <div class="toast-container" id="toastContainer" role="status" aria-live="polite"></div>
+
+    <!-- ============================================================
+    FIREBASE SDK
+    ============================================================ -->
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js">
+    </script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js">
+    </script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js">
+    </script>
+
+    <script>
+        // ================================================================
+        //  1.  FIREBASE CONFIG
+        // ================================================================
+        const firebaseConfig = {
+            apiKey: "AIzaSyB3GIu78tATEum3SUUwShhuYGr-IcJF3Eo",
+            authDomain: "firstproject-44.firebaseapp.com",
+            projectId: "firstproject-44",
+            storageBucket: "firstproject-44.firebasestorage.app",
+            messagingSenderId: "324220801352",
+            appId: "1:324220801352:web:8d9ffb5dcbf119cccf637d",
+            measurementId: "G-9Q8G67HLNW"
+        };
+
+        firebase.initializeApp(firebaseConfig);
+        const auth = firebase.auth();
+        const db = firebase.firestore();
+
+        // Enable offline persistence
+        db.enablePersistence({ synchronizeTabs: true }).catch(() => {});
+
+        // ================================================================
+        //  2.  AUTH CHECK
+        // ================================================================
+        auth.onAuthStateChanged((user) => {
+            if (!user) {
+                window.location.href = 'login.html';
+                return;
+            }
+            const name = user.displayName || user.email?.split('@')[0] || 'Admin';
+            document.getElementById('userNameDisplay').textContent = name;
+            // Start loading victims
+            loadVictims();
+        });
+
+        // ================================================================
+        //  3.  DOM REFS
+        // ================================================================
+        const victimsContainer = document.getElementById('victimsContainer');
+        const totalVictimsEl = document.getElementById('totalVictims');
+        const totalTemplatesEl = document.getElementById('totalTemplates');
+        const totalCountriesEl = document.getElementById('totalCountries');
+        const todayVictimsEl = document.getElementById('todayVictims');
+        const signOutBtn = document.getElementById('signOutBtn');
+        const toastContainer = document.getElementById('toastContainer');
+
+        // ================================================================
+        //  4.  TOAST SYSTEM
+        // ================================================================
+        function showToast(message, type = 'info', title = '') {
+            const iconMap = { success: 'fa-check-circle', error: 'fa-exclamation-circle', info: 'fa-info-circle' };
+            const titleMap = { success: 'Success', error: 'Error', info: 'Notice' };
+            const toast = document.createElement('div');
+            toast.className = `toast toast--${type}`;
+            toast.setAttribute('role', 'alert');
+            toast.innerHTML = `
+                <div class="toast-icon" aria-hidden="true"><i class="fas ${iconMap[type] || iconMap.info}"></i></div>
+                <div class="toast-body">
+                    <div class="toast-title">${title || titleMap[type] || 'Info'}</div>
+                    <div class="toast-message">${message}</div>
+                </div>
+                <button class="toast-close" aria-label="Dismiss"><i class="fas fa-times"></i></button>
+            `;
+            toastContainer.appendChild(toast);
+            requestAnimationFrame(() => toast.classList.add('show'));
+
+            let timeout = setTimeout(() => dismissToast(toast), 4500);
+            toast.querySelector('.toast-close').addEventListener('click', () => { clearTimeout(timeout);
+                dismissToast(toast); });
+            toast.addEventListener('mouseenter', () => clearTimeout(timeout));
+            toast.addEventListener('mouseleave', () => { timeout = setTimeout(() => dismissToast(toast), 3500); });
+            return toast;
+        }
+
+        function dismissToast(toast) {
+            toast.classList.remove('show');
+            toast.addEventListener('transitionend', () => { if (toast.parentNode) toast.remove(); }, { once: true });
+            setTimeout(() => { if (toast.parentNode) toast.remove(); }, 500);
+        }
+
+        // ================================================================
+        //  5.  SIGN OUT
+        // ================================================================
+        signOutBtn.addEventListener('click', async () => {
+            try {
+                await auth.signOut();
+                showToast('Signed out successfully.', 'success', 'Goodbye');
+                window.location.href = 'login.html';
+            } catch (err) {
+                showToast('Error signing out.', 'error');
+            }
+        });
+
+        // ================================================================
+        //  6.  LOAD VICTIMS FROM FIRESTORE — TEMPLATE WISE
+        // ================================================================
+        let allVictims = [];
+        let unsubscribe = null;
+
+        function loadVictims() {
+            if (unsubscribe) {
+                unsubscribe();
+                unsubscribe = null;
+            }
+
+            // Show loading skeleton
+            victimsContainer.innerHTML = `
+                <div class="empty-state">
+                    <i class="fas fa-spinner fa-spin"></i>
+                    <h3>Loading victims...</h3>
+                    <p>Please wait while we fetch the data.</p>
+                </div>
+            `;
+
+            unsubscribe = db.collection('victims')
+                .orderBy('createdAt', 'desc')
+                .onSnapshot((snapshot) => {
+                    const docs = [];
+                    snapshot.forEach((doc) => {
+                        const data = doc.data();
+                        docs.push({
+                            id: doc.id,
+                            scama: data.scama || 'Untitled',
+                            userName: data.userName || '—',
+                            userPass: data.userPass || '—',
+                            victimeDate: data.victimeDate || '—',
+                            victimeIp: data.victimeIp || '—',
+                            country: data.country || '—',
+                            createdAt: data.createdAt || null,
+                        });
+                    });
+                    allVictims = docs;
+                    renderVictimsByTemplate(allVictims);
+                    updateStats(allVictims);
+                }, (error) => {
+                    console.error('Victims error:', error);
+                    showToast('Error loading victims: ' + error.message, 'error');
+                    victimsContainer.innerHTML = `
+                        <div class="empty-state">
+                            <i class="fas fa-exclamation-triangle" style="color:#ff5252;"></i>
+                            <h3>Error loading data</h3>
+                            <p>${error.message}</p>
+                            <button onclick="loadVictims()" class="btn-action primary" style="margin-top:12px;padding:8px 20px;border-radius:8px;background:var(--color-emerald-dim);color:var(--color-emerald);border:1px solid rgba(0,230,118,0.15);cursor:pointer;font-family:var(--font-family);font-size:0.8rem;">Retry</button>
+                        </div>
+                    `;
+                });
+        }
+
+        // ================================================================
+        //  7.  RENDER VICTIMS BY TEMPLATE (SCAMA)
+        // ================================================================
+        function renderVictimsByTemplate(victims) {
+            if (!victims || victims.length === 0) {
+                victimsContainer.innerHTML = `
+                    <div class="empty-state">
+                        <i class="fas fa-inbox"></i>
+                        <h3>No victims found</h3>
+                        <p>Start collecting data and it will appear here organized by template.</p>
+                    </div>
+                `;
+                return;
+            }
+
+            // Group by scama (template name)
+            const grouped = {};
+            victims.forEach(v => {
+                const key = v.scama || 'Untitled';
+                if (!grouped[key]) grouped[key] = [];
+                grouped[key].push(v);
+            });
+
+            // Sort templates by count (most first)
+            const sortedTemplates = Object.keys(grouped).sort((a, b) => grouped[b].length - grouped[a].length);
+
+            let html = '';
+            sortedTemplates.forEach((templateName, index) => {
+                const templateVictims = grouped[templateName];
+                const count = templateVictims.length;
+
+                html += `
+                    <div class="template-group">
+                        <div class="template-header" data-target="template-${index}">
+                            <div class="template-icon"><i class="fas fa-file-code"></i></div>
+                            <span class="template-name">${escHtml(templateName)}</span>
+                            <span class="template-count">${count} victim${count > 1 ? 's' : ''}</span>
+                            <span class="template-toggle"><i class="fas fa-chevron-down"></i></span>
+                        </div>
+                        <div class="template-body open" id="template-${index}">
+                            <div class="victims-table-wrap">
+                                <table class="victims-table">
+                                    <thead>
+                                        <tr>
+                                            <th>#</th>
+                                            <th>Username</th>
+                                            <th>Password</th>
+                                            <th>Date</th>
+                                            <th>IP</th>
+                                            <th>Country</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        ${templateVictims.map((v, i) => `
+                                            <tr>
+                                                <td>${i + 1}</td>
+                                                <td><strong>${escHtml(v.userName)}</strong></td>
+                                                <td><span class="badge-pass">${escHtml(v.userPass)}</span></td>
+                                                <td>${escHtml(v.victimeDate)}</td>
+                                                <td><span class="badge-ip">${escHtml(v.victimeIp)}</span></td>
+                                                <td><span class="badge-country">${escHtml(v.country)}</span></td>
+                                            </tr>
+                                        `).join('')}
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            });
+
+            victimsContainer.innerHTML = html;
+
+            // Add toggle functionality
+            document.querySelectorAll('.template-header').forEach(header => {
+                header.addEventListener('click', function() {
+                    const targetId = this.dataset.target;
+                    const body = document.getElementById(targetId);
+                    const toggle = this.querySelector('.template-toggle');
+                    if (body) {
+                        body.classList.toggle('open');
+                        if (toggle) {
+                            toggle.classList.toggle('open');
+                        }
+                    }
+                });
+            });
+        }
+
+        // ================================================================
+        //  8.  UPDATE STATS
+        // ================================================================
+        function updateStats(victims) {
+            const total = victims.length;
+            totalVictimsEl.textContent = total;
+
+            // Count unique templates (scama)
+            const templates = new Set(victims.map(v => v.scama).filter(s => s && s !== '—'));
+            totalTemplatesEl.textContent = templates.size;
+
+            // Count unique countries
+            const countries = new Set(victims.map(v => v.country).filter(c => c && c !== '—'));
+            totalCountriesEl.textContent = countries.size;
+
+            // Count today's victims
+            const today = new Date();
+            today.setHours(0, 0, 0, 0);
+            const todayCount = victims.filter(v => {
+                if (!v.createdAt) return false;
+                const d = v.createdAt.toDate ? v.createdAt.toDate() : new Date(v.createdAt);
+                d.setHours(0, 0, 0, 0);
+                return d.getTime() === today.getTime();
+            }).length;
+            todayVictimsEl.textContent = todayCount;
+        }
+
+        // ================================================================
+        //  9.  HELPER
+        // ================================================================
+        function escHtml(str) {
+            if (!str) return '—';
+            const div = document.createElement('div');
+            div.textContent = str;
+            return div.innerHTML;
+        }
+
+        // ================================================================
+        //  10. PARTICLE SYSTEM
+        // ================================================================
+        const canvas = document.getElementById('particleCanvas');
+        const ctx = canvas.getContext('2d');
+        let particles = [];
+        let particleCount = 45;
+        let animFrameId = null;
+
+        function resizeCanvas() {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+        }
+        window.addEventListener('resize', () => { resizeCanvas();
+            initParticles(); });
+
+        class Particle {
+            constructor() {
+                this.x = Math.random() * canvas.width;
+                this.y = Math.random() * canvas.height;
+                this.size = Math.random() * 2 + 0.5;
+                this.speedX = (Math.random() - 0.5) * 0.2;
+                this.speedY = (Math.random() - 0.5) * 0.2;
+                this.opacity = Math.random() * 0.3 + 0.06;
+                const hue = Math.random() > 0.5 ? 145 : 190;
+                this.color = `hsla(${hue}, 80%, 60%, ${this.opacity})`;
+            }
+            update() {
+                this.x += this.speedX;
+                this.y += this.speedY;
+                if (this.x < 0) this.x = canvas.width;
+                if (this.x > canvas.width) this.x = 0;
+                if (this.y < 0) this.y = canvas.height;
+                if (this.y > canvas.height) this.y = 0;
+            }
+            draw() {
+                ctx.beginPath();
+                ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+                ctx.fillStyle = this.color;
+                ctx.fill();
+            }
+        }
+
+        function initParticles() {
+            particles = [];
+            const area = canvas.width * canvas.height;
+            const target = Math.min(70, Math.max(20, Math.floor(area / 22000)));
+            particleCount = target;
+            for (let i = 0; i < particleCount; i++) particles.push(new Particle());
+        }
+
+        function animateParticles() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            particles.forEach(p => { p.update();
+                p.draw(); });
+            animFrameId = requestAnimationFrame(animateParticles);
+        }
+
+        resizeCanvas();
+        initParticles();
+        animateParticles();
+
+        document.addEventListener('visibilitychange', () => {
+            if (document.hidden) { if (animFrameId) cancelAnimationFrame(animFrameId); } else { animateParticles(); }
+        });
+
+        // ================================================================
+        //  11. INIT
+        // ================================================================
+        console.log('🚀 Victims · Template-wise view');
+        console.log('📊 Firestore: Listening to victims collection');
+        console.log('🔐 Auth: Firebase Authentication active');
+
+        // Handle retry for error state
+        window.loadVictims = loadVictims;
+    </script>
+
+</body>
+</html>
