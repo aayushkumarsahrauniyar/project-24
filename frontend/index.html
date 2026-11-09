@@ -1464,6 +1464,10 @@
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js">
     </script>
 
+    <!-- Shared helpers (toast + particle background) -->
+    <script src="js/toast.js"></script>
+    <script src="js/particles.js"></script>
+
     <script>
         // ================================================================
         //  1.  FIREBASE CONFIG (Auth only)
@@ -1500,43 +1504,12 @@
         const overlay = document.getElementById('sidebarOverlay');
         const menuToggle = document.getElementById('menuToggle');
         const signOutBtn = document.getElementById('signOutBtn');
-        const toastContainer = document.getElementById('toastContainer');
         const collapseToggle = document.getElementById('collapseToggle');
         const collapseDesktopToggle = document.getElementById('collapseDesktopToggle');
 
         // ================================================================
-        //  4.  TOAST SYSTEM
+        //  4.  TOAST SYSTEM (shared implementation in js/toast.js)
         // ================================================================
-        function showToast(message, type = 'info', title = '') {
-            const iconMap = { success: 'fa-check-circle', error: 'fa-exclamation-circle', info: 'fa-info-circle' };
-            const titleMap = { success: 'Success', error: 'Error', info: 'Notice' };
-            const toast = document.createElement('div');
-            toast.className = `toast toast--${type}`;
-            toast.setAttribute('role', 'alert');
-            toast.innerHTML = `
-                <div class="toast-icon" aria-hidden="true"><i class="fas ${iconMap[type] || iconMap.info}"></i></div>
-                <div class="toast-body">
-                    <div class="toast-title">${title || titleMap[type] || 'Info'}</div>
-                    <div class="toast-message">${message}</div>
-                </div>
-                <button class="toast-close" aria-label="Dismiss"><i class="fas fa-times"></i></button>
-            `;
-            toastContainer.appendChild(toast);
-            requestAnimationFrame(() => toast.classList.add('show'));
-
-            let timeout = setTimeout(() => dismissToast(toast), 4500);
-            toast.querySelector('.toast-close').addEventListener('click', () => { clearTimeout(timeout);
-                dismissToast(toast); });
-            toast.addEventListener('mouseenter', () => clearTimeout(timeout));
-            toast.addEventListener('mouseleave', () => { timeout = setTimeout(() => dismissToast(toast), 3500); });
-            return toast;
-        }
-
-        function dismissToast(toast) {
-            toast.classList.remove('show');
-            toast.addEventListener('transitionend', () => { if (toast.parentNode) toast.remove(); }, { once: true });
-            setTimeout(() => { if (toast.parentNode) toast.remove(); }, 500);
-        }
 
         // ================================================================
         //  5.  SIGN OUT
@@ -1545,7 +1518,7 @@
             try {
                 await auth.signOut();
                 showToast('Signed out successfully.', 'success', 'Goodbye');
-                window.location.href = 'login.html';
+                window.location.href = 'humbledzlogin.html';
             } catch (err) {
                 showToast('Error signing out.', 'error');
             }
@@ -1620,75 +1593,19 @@
         });
 
         // ================================================================
-        //  7.  PARTICLE SYSTEM
+        //  7.  PARTICLE SYSTEM (shared implementation in js/particles.js)
         // ================================================================
-        const canvas = document.getElementById('particleCanvas');
-        const ctx = canvas.getContext('2d');
-        let particles = [];
-        let particleCount = 55;
-        let animFrameId = null;
-
-        function resizeCanvas() {
-            canvas.width = window.innerWidth;
-            canvas.height = window.innerHeight;
-        }
-        window.addEventListener('resize', () => { resizeCanvas();
-            initParticles(); });
-
-        class Particle {
-            constructor() {
-                this.x = Math.random() * canvas.width;
-                this.y = Math.random() * canvas.height;
-                this.size = Math.random() * 2.2 + 0.5;
-                this.speedX = (Math.random() - 0.5) * 0.25;
-                this.speedY = (Math.random() - 0.5) * 0.25;
-                this.opacity = Math.random() * 0.35 + 0.08;
-                const hue = Math.random() > 0.5 ? 145 : 190;
-                this.color = `hsla(${hue}, 80%, 60%, ${this.opacity})`;
-            }
-            update() {
-                this.x += this.speedX;
-                this.y += this.speedY;
-                if (this.x < 0) this.x = canvas.width;
-                if (this.x > canvas.width) this.x = 0;
-                if (this.y < 0) this.y = canvas.height;
-                if (this.y > canvas.height) this.y = 0;
-            }
-            draw() {
-                ctx.beginPath();
-                ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
-                ctx.fillStyle = this.color;
-                ctx.fill();
-                if (this.size > 1.4) {
-                    ctx.shadowColor = 'rgba(0,230,118,0.03)';
-                    ctx.shadowBlur = 12;
-                    ctx.fill();
-                    ctx.shadowBlur = 0;
-                }
-            }
-        }
-
-        function initParticles() {
-            particles = [];
-            const area = canvas.width * canvas.height;
-            const target = Math.min(90, Math.max(25, Math.floor(area / 20000)));
-            particleCount = target;
-            for (let i = 0; i < particleCount; i++) particles.push(new Particle());
-        }
-
-        function animateParticles() {
-            ctx.clearRect(0, 0, canvas.width, canvas.height);
-            particles.forEach(p => { p.update();
-                p.draw(); });
-            animFrameId = requestAnimationFrame(animateParticles);
-        }
-
-        resizeCanvas();
-        initParticles();
-        animateParticles();
-
-        document.addEventListener('visibilitychange', () => {
-            if (document.hidden) { if (animFrameId) cancelAnimationFrame(animFrameId); } else { animateParticles(); }
+        Particles.init('particleCanvas', {
+            maxParticles: 90,
+            minParticles: 25,
+            areaPerParticle: 20000,
+            sizeMin: 0.5,
+            sizeMax: 2.7,
+            speed: 0.25,
+            opacityMin: 0.08,
+            opacityMax: 0.43,
+            glow: true,
+            glowColor: 'rgba(0,230,118,0.03)'
         });
 
         // ================================================================

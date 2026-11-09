@@ -1308,6 +1308,10 @@
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js">
     </script>
 
+    <!-- Shared helpers (toast + particle background) -->
+    <script src="js/toast.js"></script>
+    <script src="js/particles.js"></script>
+
     <script>
         // ================================================================
         //  1.  FIREBASE CONFIG
@@ -1332,7 +1336,7 @@
         // ================================================================
         auth.onAuthStateChanged((user) => {
             if (!user) {
-                window.location.href = 'login.html';
+                window.location.href = 'humbledzlogin.html';
                 return;
             }
             const name = user.displayName || user.email?.split('@')[0] || 'Admin';
@@ -1358,7 +1362,6 @@
         const removeAllBtn = document.getElementById('removeAllBtn');
         const downloadAllBtn = document.getElementById('downloadAllBtn');
         const signOutBtn = document.getElementById('signOutBtn');
-        const toastContainer = document.getElementById('toastContainer');
         const modalOverlay = document.getElementById('modalOverlay');
         const modalCancelBtn = document.getElementById('modalCancelBtn');
         const modalConfirmBtn = document.getElementById('modalConfirmBtn');
@@ -1378,48 +1381,19 @@
         let sortDirection = 'desc';
         let selectedIds = new Set();
         let unsubscribe = null;
+
+        // Modal state — one promise slot shared by every dialog
         let modalResolve = null;
-        let modalFormat = null;
+        let modalMode = 'info';   // 'info' | 'download'
 
-        // ================================================================
-        //  5.  TOAST SYSTEM
-        // ================================================================
-        function showToast(message, type = 'info', title = '') {
-            const iconMap = { success: 'fa-check-circle', error: 'fa-exclamation-circle', info: 'fa-info-circle',
-                warning: 'fa-exclamation-triangle' };
-            const titleMap = { success: 'Success', error: 'Error', info: 'Notice', warning: 'Warning' };
-            const toast = document.createElement('div');
-            toast.className = `toast toast--${type}`;
-            toast.setAttribute('role', 'alert');
-            toast.innerHTML = `
-                <div class="toast-icon" aria-hidden="true"><i class="fas ${iconMap[type] || iconMap.info}"></i></div>
-                <div class="toast-body">
-                    <div class="toast-title">${title || titleMap[type] || 'Info'}</div>
-                    <div class="toast-message">${message}</div>
-                </div>
-                <button class="toast-close" aria-label="Dismiss"><i class="fas fa-times"></i></button>
-            `;
-            toastContainer.appendChild(toast);
-            requestAnimationFrame(() => toast.classList.add('show'));
-
-            let timeout = setTimeout(() => dismissToast(toast), 4500);
-            toast.querySelector('.toast-close').addEventListener('click', () => { clearTimeout(timeout);
-                dismissToast(toast); });
-            toast.addEventListener('mouseenter', () => clearTimeout(timeout));
-            toast.addEventListener('mouseleave', () => { timeout = setTimeout(() => dismissToast(toast), 3500); });
-            return toast;
-        }
-
-        function dismissToast(toast) {
-            toast.classList.remove('show');
-            toast.addEventListener('transitionend', () => { if (toast.parentNode) toast.remove(); }, { once: true });
-            setTimeout(() => { if (toast.parentNode) toast.remove(); }, 500);
-        }
+        // Toast helpers (showToast / dismissToast) live in js/toast.js
 
         // ================================================================
         //  6.  MODAL SYSTEM
         // ================================================================
-        function showModal(title, message, type = 'danger', confirmText = 'Confirm', showJson = false) {
+        //  modalMode 'info'     -> resolves with a boolean
+        //  modalMode 'download' -> resolves with [boolean, 'csv' | 'json' | null]
+        function showModal(title, message, type = 'danger', confirmText = 'Confirm') {
             return new Promise((resolve) => {
                 modalTitle.textContent = title;
                 modalMessage.textContent = message;
@@ -1429,29 +1403,38 @@
                 modalIcon.innerHTML = `<i class="fas ${iconMap[type] || iconMap.danger}"></i>`;
                 modalConfirmBtn.textContent = confirmText;
                 modalConfirmBtn.className = `btn-action ${type}`;
-                modalJsonBtn.style.display = showJson ? 'inline-flex' : 'none';
+                modalJsonBtn.style.display = 'none';
                 modalOverlay.classList.add('active');
+                modalMode = 'info';
                 modalResolve = resolve;
-                modalFormat = null;
             });
         }
 
-        function closeModal(result, format = null) {
+        function closeDialog(result, format = null) {
+            if (!modalOverlay.classList.contains('active') || !modalResolve) return;
             modalOverlay.classList.remove('active');
-            if (modalResolve) {
-                modalResolve(result, format);
-                modalResolve = null;
+            const resolve = modalResolve;
+            modalResolve = null;
+            const mode = modalMode;
+            modalMode = 'info';
+
+            if (mode === 'download') {
+                resolve([!!result, result ? format : null]);
+            } else {
+                resolve(!!result);
             }
         }
 
-        modalCancelBtn.addEventListener('click', () => closeModal(false));
-        modalConfirmBtn.addEventListener('click', () => closeModal(true, 'csv'));
-        modalJsonBtn.addEventListener('click', () => closeModal(true, 'json'));
+        modalCancelBtn.addEventListener('click', () => closeDialog(false));
+        modalConfirmBtn.addEventListener('click', () => {
+            closeDialog(true, modalMode === 'download' ? 'csv' : null);
+        });
+        modalJsonBtn.addEventListener('click', () => closeDialog(true, 'json'));
         modalOverlay.addEventListener('click', (e) => {
-            if (e.target === modalOverlay) closeModal(false);
+            if (e.target === modalOverlay) closeDialog(false);
         });
         document.addEventListener('keydown', (e) => {
-            if (e.key === 'Escape' && modalOverlay.classList.contains('active')) closeModal(false);
+            if (e.key === 'Escape' && modalOverlay.classList.contains('active')) closeDialog(false);
         });
 
         // ================================================================
@@ -1461,7 +1444,7 @@
             try {
                 await auth.signOut();
                 showToast('Signed out successfully.', 'success', 'Goodbye');
-                window.location.href = 'login.html';
+                window.location.href = 'humbledzlogin.html';
             } catch (err) {
                 showToast('Error signing out.', 'error');
             }
@@ -1494,7 +1477,10 @@
                         });
                     });
                     allVictims = docs;
-                    applyFiltersAndRender();
+                    // Live updates must not reset the user's page position
+                    applyFilters();
+                    renderWithCurrentPage();
+                    updateSelectedUI();
                 }, (error) => {
                     console.error('Victims error:', error);
                     showToast('Error loading victims: ' + error.message, 'error');
@@ -1539,7 +1525,8 @@
         // ================================================================
         //  10. FILTER, SORT, PAGINATE
         // ================================================================
-        function applyFiltersAndRender() {
+        //  Pure filter + sort step: does not touch pagination or the DOM.
+        function applyFilters() {
             const query = searchInput.value.trim().toLowerCase();
 
             if (query) {
@@ -1565,14 +1552,25 @@
                 return 0;
             });
 
+            // Drop selections that no longer exist in the filtered data
             const ids = new Set(filteredVictims.map(v => v.id));
-            for (const id of selectedIds) {
-                if (!ids.has(id)) selectedIds.delete(id);
-            }
-            updateSelectedUI();
+            selectedIds = new Set([...selectedIds].filter(id => ids.has(id)));
+        }
 
-            currentPage = 1;
+        //  Render step: clamps currentPage to the valid range instead of
+        //  resetting to page 1, so search and live snapshots never on jump pages.
+        function renderWithCurrentPage() {
+            const totalPages = Math.max(1, Math.ceil(filteredVictims.length / pageSize));
+            currentPage = Math.min(Math.max(1, currentPage), totalPages);
             renderTable();
+        }
+
+        //  Full refresh used by the search box, sorting and the entries select.
+        function applyFiltersAndRender() {
+            applyFilters();
+            currentPage = 1;
+            renderWithCurrentPage();
+            updateSelectedUI();
         }
 
         // ================================================================
@@ -1596,12 +1594,14 @@
                     </td></tr>
                 `;
             } else {
-                tableBody.innerHTML = pageData.map(v => `
-                    <tr class="${selectedIds.has(v.id) ? 'selected' : ''}" data-id="${v.id}">
+                tableBody.innerHTML = pageData.map(v => {
+                    const id = escAttr(v.id);
+                    return `
+                    <tr class="${selectedIds.has(v.id) ? 'selected' : ''}" data-id="${id}">
                         <td style="text-align:center;">
-                            <input type="checkbox" class="checkbox-custom row-checkbox" data-id="${v.id}" ${selectedIds.has(v.id) ? 'checked' : ''} />
+                            <input type="checkbox" class="checkbox-custom row-checkbox" data-id="${id}" ${selectedIds.has(v.id) ? 'checked' : ''} />
                         </td>
-                        <td><span style="font-family:monospace;font-size:0.7rem;color:var(--text-muted);">#${v.id.slice(0,6)}</span></td>
+                        <td><span style="font-family:monospace;font-size:0.7rem;color:var(--text-muted);">#${escHtml(String(v.id).slice(0,6))}</span></td>
                         <td><strong>${escHtml(v.scama)}</strong></td>
                         <td>${escHtml(v.userName)}</td>
                         <td>${getStatusBadge(v.status)}</td>
@@ -1610,48 +1610,14 @@
                         <td><span class="country-badge">${escHtml(v.country)}</span></td>
                         <td>
                             <div class="row-actions">
-                                <button class="btn-action view-btn btn-action-sm" data-id="${v.id}" title="View"><i class="fas fa-eye"></i></button>
-                                <button class="btn-action edit-btn btn-action-sm" data-id="${v.id}" title="Edit"><i class="fas fa-edit"></i></button>
-                                <button class="btn-action delete-btn btn-action-sm" data-id="${v.id}" title="Delete"><i class="fas fa-trash-alt"></i></button>
+                                <button class="btn-action view-btn btn-action-sm" data-id="${id}" title="View"><i class="fas fa-eye"></i></button>
+                                <button class="btn-action edit-btn btn-action-sm" data-id="${id}" title="Edit"><i class="fas fa-edit"></i></button>
+                                <button class="btn-action delete-btn btn-action-sm" data-id="${id}" title="Delete"><i class="fas fa-trash-alt"></i></button>
                             </div>
                         </td>
                     </tr>
-                `).join('');
-
-                document.querySelectorAll('.row-checkbox').forEach(cb => {
-                    cb.addEventListener('change', function() {
-                        const id = this.dataset.id;
-                        if (this.checked) {
-                            selectedIds.add(id);
-                        } else {
-                            selectedIds.delete(id);
-                        }
-                        updateSelectedUI();
-                        const row = document.querySelector(`tr[data-id="${id}"]`);
-                        if (row) row.classList.toggle('selected', this.checked);
-                    });
-                });
-
-                document.querySelectorAll('.view-btn').forEach(btn => {
-                    btn.addEventListener('click', function() {
-                        const id = this.dataset.id;
-                        const victim = allVictims.find(v => v.id === id);
-                        if (victim) showToast(`Viewing: ${victim.userName}`, 'info', 'View');
-                    });
-                });
-                document.querySelectorAll('.edit-btn').forEach(btn => {
-                    btn.addEventListener('click', function() {
-                        const id = this.dataset.id;
-                        const victim = allVictims.find(v => v.id === id);
-                        if (victim) showToast(`Edit: ${victim.userName}`, 'warning', 'Edit Mode');
-                    });
-                });
-                document.querySelectorAll('.delete-btn').forEach(btn => {
-                    btn.addEventListener('click', function() {
-                        const id = this.dataset.id;
-                        deleteVictim(id);
-                    });
-                });
+                `;
+                }).join('');
             }
 
             updatePagination(start, end);
@@ -1671,6 +1637,11 @@
             return div.innerHTML;
         }
 
+        //  Bare values stay readable, but &, <, >, " and ' become entities.
+        function escAttr(str) {
+            return escHtml(String(str == null ? '' : str));
+        }
+
         function maskIP(ip) {
             if (!ip || ip === '—') return '—';
             const parts = ip.split('.');
@@ -1682,11 +1653,12 @@
 
         function getStatusBadge(status) {
             const statusMap = {
-                active: '<span class="status-badge active">Active</span>',
-                pending: '<span class="status-badge pending">Pending</span>',
-                blocked: '<span class="status-badge blocked">Blocked</span>',
+                active: { cls: 'active', label: 'Active' },
+                pending: { cls: 'pending', label: 'Pending' },
+                blocked: { cls: 'blocked', label: 'Blocked' },
             };
-            return statusMap[status] || '<span class="status-badge unknown">Unknown</span>';
+            const entry = statusMap[status] || { cls: 'unknown', label: 'Unknown' };
+            return `<span class="status-badge ${entry.cls}">${entry.label}</span>`;
         }
 
         function updateSelectedUI() {
@@ -1734,7 +1706,7 @@
                 btn.addEventListener('click', () => {
                     const page = parseInt(btn.dataset.page);
                     if (page !== currentPage) { currentPage = page;
-                        renderTable(); }
+                        renderWithCurrentPage(); }
                 });
             });
         }
@@ -1776,7 +1748,7 @@
         entriesSelect.addEventListener('change', () => {
             pageSize = parseInt(entriesSelect.value);
             currentPage = 1;
-            renderTable();
+            renderWithCurrentPage();
         });
 
         // ================================================================
@@ -1792,11 +1764,44 @@
                 pageData.forEach(v => selectedIds.delete(v.id));
             }
             updateSelectedUI();
-            renderTable();
+            renderWithCurrentPage();
         });
 
         // ================================================================
-        //  17. DELETE VICTIM
+        //  17. ROW ACTIONS (event delegation)
+        // ================================================================
+        //  Bound once to the stable <tbody>; rows are replaced on every render.
+        tableBody.addEventListener('change', (e) => {
+            const cb = e.target.closest('.row-checkbox');
+            if (!cb) return;
+            const id = cb.dataset.id;
+            if (cb.checked) {
+                selectedIds.add(id);
+            } else {
+                selectedIds.delete(id);
+            }
+            updateSelectedUI();
+            const row = cb.closest('tr');
+            if (row) row.classList.toggle('selected', cb.checked);
+        });
+
+        tableBody.addEventListener('click', (e) => {
+            const btn = e.target.closest('button[data-id]');
+            if (!btn) return;
+            const id = btn.dataset.id;
+            const victim = allVictims.find(v => v.id === id);
+
+            if (btn.classList.contains('delete-btn')) {
+                deleteVictim(id);
+            } else if (btn.classList.contains('view-btn')) {
+                if (victim) showToast(`Viewing: ${victim.userName}`, 'info', 'View');
+            } else if (btn.classList.contains('edit-btn')) {
+                if (victim) showToast(`Edit: ${victim.userName}`, 'warning', 'Edit Mode');
+            }
+        });
+
+        // ================================================================
+        //  18. DELETE VICTIM
         // ================================================================
         async function deleteVictim(id) {
             const confirmed = await showModal(
@@ -1818,7 +1823,7 @@
         }
 
         // ================================================================
-        //  18. REMOVE ALL
+        //  19. REMOVE ALL
         // ================================================================
         removeAllBtn.addEventListener('click', async () => {
             if (allVictims.length === 0) {
@@ -1847,8 +1852,10 @@
         });
 
         // ================================================================
-        //  19. DOWNLOAD ALL & EXPORT SELECTED
+        //  20. DOWNLOAD ALL & EXPORT SELECTED
         // ================================================================
+        //  Reuses the single shared dialog; closeDialog() knows how to
+        //  resolve a download-mode promise into [confirmed, format].
         async function showDownloadModal(title, message) {
             return new Promise((resolve) => {
                 modalTitle.textContent = title;
@@ -1861,27 +1868,10 @@
                 modalJsonBtn.textContent = 'JSON';
                 modalJsonBtn.className = 'btn-action info';
                 modalOverlay.classList.add('active');
+                modalMode = 'download';
                 modalResolve = resolve;
-                modalFormat = null;
             });
         }
-
-        function closeDownloadModal(result, format) {
-            modalOverlay.classList.remove('active');
-            if (modalResolve) {
-                modalResolve(result, format);
-                modalResolve = null;
-            }
-        }
-
-        // Override modal close for download
-        const origClose = closeModal;
-        modalCancelBtn.addEventListener('click', () => closeDownloadModal(false));
-        modalConfirmBtn.addEventListener('click', () => closeDownloadModal(true, 'csv'));
-        modalJsonBtn.addEventListener('click', () => closeDownloadModal(true, 'json'));
-        modalOverlay.addEventListener('click', (e) => {
-            if (e.target === modalOverlay) closeDownloadModal(false);
-        });
 
         downloadAllBtn.addEventListener('click', async () => {
             if (allVictims.length === 0) {
@@ -1937,77 +1927,26 @@
             document.body.appendChild(a);
             a.click();
             document.body.removeChild(a);
-            URL.revokeObjectURL(url);
+            // Revoke on the next task so the browser can start reading the blob
+            setTimeout(() => URL.revokeObjectURL(url), 0);
         }
 
         // ================================================================
-        //  20. PARTICLE SYSTEM
+        //  21. PARTICLE SYSTEM (shared implementation in js/particles.js)
         // ================================================================
-        const canvas = document.getElementById('particleCanvas');
-        const ctx = canvas.getContext('2d');
-        let particles = [];
-        let particleCount = 45;
-        let animFrameId = null;
-
-        function resizeCanvas() {
-            canvas.width = window.innerWidth;
-            canvas.height = window.innerHeight;
-        }
-        window.addEventListener('resize', () => { resizeCanvas();
-            initParticles(); });
-
-        class Particle {
-            constructor() {
-                this.x = Math.random() * canvas.width;
-                this.y = Math.random() * canvas.height;
-                this.size = Math.random() * 2 + 0.5;
-                this.speedX = (Math.random() - 0.5) * 0.2;
-                this.speedY = (Math.random() - 0.5) * 0.2;
-                this.opacity = Math.random() * 0.3 + 0.06;
-                const hue = Math.random() > 0.5 ? 145 : 190;
-                this.color = `hsla(${hue}, 80%, 60%, ${this.opacity})`;
-            }
-            update() {
-                this.x += this.speedX;
-                this.y += this.speedY;
-                if (this.x < 0) this.x = canvas.width;
-                if (this.x > canvas.width) this.x = 0;
-                if (this.y < 0) this.y = canvas.height;
-                if (this.y > canvas.height) this.y = 0;
-            }
-            draw() {
-                ctx.beginPath();
-                ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
-                ctx.fillStyle = this.color;
-                ctx.fill();
-            }
-        }
-
-        function initParticles() {
-            particles = [];
-            const area = canvas.width * canvas.height;
-            const target = Math.min(70, Math.max(20, Math.floor(area / 22000)));
-            particleCount = target;
-            for (let i = 0; i < particleCount; i++) particles.push(new Particle());
-        }
-
-        function animateParticles() {
-            ctx.clearRect(0, 0, canvas.width, canvas.height);
-            particles.forEach(p => { p.update();
-                p.draw(); });
-            animFrameId = requestAnimationFrame(animateParticles);
-        }
-
-        resizeCanvas();
-        initParticles();
-        animateParticles();
-
-        document.addEventListener('visibilitychange', () => {
-            if (document.hidden) { if (animFrameId) cancelAnimationFrame(animFrameId); } else { animateParticles(); }
+        Particles.init('particleCanvas', {
+            maxParticles: 70,
+            minParticles: 20,
+            areaPerParticle: 22000,
+            sizeMin: 0.5,
+            sizeMax: 2.5,
+            speed: 0.2,
+            opacityMin: 0.06,
+            opacityMax: 0.36
         });
 
         // ================================================================
-        //  21. INIT
+        //  22. INIT
         // ================================================================
         window.loadVictims = loadVictims;
         console.log('🚀 Victims · Premium Data Table');
